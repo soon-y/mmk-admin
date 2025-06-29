@@ -1,10 +1,11 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useLocation } from 'react-router-dom'
 import { X, Plus, ImagePlus } from "lucide-react"
 import axios from 'axios'
 import LoadingBar from './LoadingBar'
-import type { ProductProps } from '../types'
+import type { ProductProps, GroupedCategory } from '../types'
+import { sortData, fetchCategory } from '../utils/categoryUtils'
 
 function ProductForm({ product }: { product: ProductProps | '' }) {
   const location = useLocation()
@@ -21,6 +22,14 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
   const [images, setImages] = useState<File[]>([])
   const [mainImg, setMainImg] = useState<File | null>(null)
   const [category, setCategory] = useState(product === '' ? '' : product.category)
+  const [categories, setCategories] = useState<GroupedCategory[]>([])
+
+  useEffect(() => {
+    fetchCategory().then((data) => {
+      setCategories(sortData(data))
+      setLoading(false)
+    })
+  }, [])
 
   const handleImageChangeMain = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -203,26 +212,23 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
         <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="product-name">
           Category
         </label>
+
         <select
+          required
           value={category}
           onChange={(e) => setCategory(e.target.value)}
           className="w-full rounded-xl bg-white p-4 appearance-none"
         >
           <option value="" disabled>Select a category</option>
-          <optgroup label="Clothing">
-            <option value="tshirts">T-shirts</option>
-            <option value="hoodies">Hoodies</option>
-          </optgroup>
-
-          <optgroup label="Accessories">
-            <option value="tote_bags">Tote Bags</option>
-            <option value="stationery">Stationery</option>
-          </optgroup>
-
-          <optgroup label="Home & Office">
-            <option value="cups">Cups</option>
-            <option value="tea_coaster">Tea Coaster</option>
-          </optgroup>
+          {categories.map((group) => (
+            <optgroup label={group.name} key={group.id}>
+              {group.children.map((sub) => (
+                <option value={sub.name} key={sub.id}>
+                  {sub.name}
+                </option>
+              ))}
+            </optgroup>
+          ))}
         </select>
 
         <div className='flex w-full space-x-4'>

@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import type { ProductProps } from '../types'
+import type { ProductProps, GroupedCategory } from '../types'
 import { ArrowDown01, ArrowDown10, ArrowDownAZ, ArrowDownZA, Image } from 'lucide-react'
+import { sortData, fetchCategory } from "../utils/categoryUtils"
+import { fetchProducts } from '../utils/productUtils'
 
 function Products() {
   const navigate = useNavigate()
@@ -10,20 +12,20 @@ function Products() {
   const [sortBy, setSortBy] = useState<'id' | 'name' | 'price' | 'stock' | null>('id')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
   const [categoryFilter, setCategoryFilter] = useState('')
+  const [categories, setCategories] = useState<GroupedCategory[]>([])
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await fetch('https://mmk-backend.onrender.com/products')
-        const data = await res.json()
-        setProducts(data)
+    Promise.all([fetchCategory(), fetchProducts()])
+      .then(([categoryData, productData]) => {
+        setCategories(sortData(categoryData))
+        setProducts(productData)
+      })
+      .catch((err) => {
+        console.error('Failed to fetch data:', err)
+      })
+      .finally(() => {
         setLoading(false)
-      } catch (err) {
-        console.error('Failed to fetch products:', err)
-      }
-    }
-
-    fetchProducts()
+      })
   }, [])
 
   function toggleSort(field: 'id' | 'name' | 'price' | 'stock') {
@@ -60,7 +62,7 @@ function Products() {
   return (
     <div className="container p-8">
       <div className="h-16 grid grid-cols-[60px_140px_1fr_10%_10%_100px] gap-2 bg-white p-4 rounded-xl font-bold text-sm mb-2 flex items-center">
-        <div className='h-5 flex itmes-center' onClick={() => toggleSort('id')}>ID <SortArrow field="id" /> </div>
+        <div className='cursor-pointer h-5 flex itmes-center' onClick={() => toggleSort('id')}>ID <SortArrow field="id" /> </div>
 
         <select
           value={categoryFilter}
@@ -68,16 +70,20 @@ function Products() {
           className="bg-transparent focus:outline-none"
         >
           <option value="">Category</option>
-          <option value="tshirts">T-shirts</option>
-          <option value="hoodies">Hoodies</option>
-          <option value="cups">Cups</option>
-          <option value="tote bags">Tote Bags</option>
-          <option value="stationerys">Stationerys</option>
+          {categories.map((group) => (
+            <optgroup label={group.name} key={group.id}>
+              {group.children.map((sub) => (
+                <option value={sub.name} key={sub.id}>
+                  {sub.name}
+                </option>
+              ))}
+            </optgroup>
+          ))}
         </select>
 
-        <div className='h-5 flex itmes-center' onClick={() => toggleSort('name')}>Name <SortArrow field="name" /></div>
-        <div className='h-5 flex itmes-center' onClick={() => toggleSort('price')}>Price <SortArrow field="price" /></div>
-        <div className='h-5 flex itmes-center' onClick={() => toggleSort('stock')}>Stock <SortArrow field="stock" /></div>
+        <div className='cursor-pointer h-5 flex itmes-center' onClick={() => toggleSort('name')}>Name <SortArrow field="name" /></div>
+        <div className='cursor-pointer h-5 flex itmes-center' onClick={() => toggleSort('price')}>Price <SortArrow field="price" /></div>
+        <div className='cursor-pointer h-5 flex itmes-center' onClick={() => toggleSort('stock')}>Stock <SortArrow field="stock" /></div>
         <p>IMG</p>
       </div>
 
