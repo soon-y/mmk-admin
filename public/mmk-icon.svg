@@ -1,0 +1,11 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+	<title>mmk-icon</title>
+	<style>
+		.s0 { fill: #00a0e8 } 
+		.s1 { fill: #e3007f } 
+		.s2 { fill: #fff000 } 
+	</style>
+	<path id="모양 1" fill-rule="evenodd" class="s0" d="m346.7 92.7l-147.4 86.2-146.7-86.2 147-84.9z"/>
+	<path id="모양 1 copy" fill-rule="evenodd" class="s1" d="m25 131l148.3 84.6-1.2 170.1-147.1-84.9z"/>
+	<path id="모양 1 copy 2" fill-rule="evenodd" class="s2" d="m224.1 386.5l-1-170.8 148-83.9v169.8z"/>
+</svg>
