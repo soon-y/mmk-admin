@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { ProductProps } from '../types'
-import { ArrowDown01, ArrowDown10, ArrowDownAZ, ArrowDownZA } from 'lucide-react'
+import { ArrowDown01, ArrowDown10, ArrowDownAZ, ArrowDownZA, Image } from 'lucide-react'
 
 function Products() {
   const navigate = useNavigate()
+  const [loading, setLoading] = useState<boolean>(true)
   const [products, setProducts] = useState<ProductProps[]>([])
   const [sortBy, setSortBy] = useState<'id' | 'name' | 'price' | 'stock' | null>('id')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
@@ -16,6 +17,7 @@ function Products() {
         const res = await fetch('https://mmk-backend.onrender.com/products')
         const data = await res.json()
         setProducts(data)
+        setLoading(false)
       } catch (err) {
         console.error('Failed to fetch products:', err)
       }
@@ -88,6 +90,19 @@ function Products() {
           <p className='pl-4'>{product.price}</p>
           <p className='pl-4'>{product.stock}</p>
           <img src={product.mainImg} alt="Product" />
+        </div>
+      ))}
+
+      {loading && Array.from({ length: 10 }).map((_, i) => (
+        <div key={i} className='grid grid-cols-[60px_140px_1fr_10%_10%_120px] gap-2 items-center border-b border-gray-300'>
+          <p className='ml-4 rounded-md w-8 h-6 bg-gray-200 animate-pulse'></p>
+          <p className='ml-5 rounded-md w-14 h-6 bg-gray-200 animate-pulse'></p>
+          <p className='ml-4 rounded-md w-[50%] h-6 bg-gray-200 animate-pulse'></p>
+          <p className='ml-4 rounded-md w-8 h-6 bg-gray-200 animate-pulse'></p>
+          <p className='ml-4 rounded-md w-8 h-6 bg-gray-200 animate-pulse'></p>
+          <div className='w-[120px] aspect-square bg-gray-200 animate-pulse grid place-items-center'>
+            <Image className='text-gray-400' />
+          </div>
         </div>
       ))}
 
