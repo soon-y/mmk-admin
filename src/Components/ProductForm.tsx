@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useLocation } from 'react-router-dom'
-import { X, Plus } from "lucide-react"
+import { X, Plus, ImagePlus } from "lucide-react"
 import axios from 'axios'
 import LoadingBar from './LoadingBar'
 import type { ProductProps } from '../types'
@@ -82,7 +82,7 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
 
     if (product === '') {
       try {
-        const res = await axios.post('http://localhost:3000/products', formData, {
+        const res = await axios.post('https://mmk-backend.onrender.com/products', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -93,7 +93,7 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
           navigate('/products')
         }
       } catch (err: unknown) {
-        const error = err as any;
+        const error = err as any
         console.error(error.response?.data || error.message || error)
       }
     } else {
@@ -103,7 +103,7 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
       })
 
       try {
-        const res = await axios.patch(`http://localhost:3000/products/${product.id}`, formData, {
+        const res = await axios.patch(`https://mmk-backend.onrender.com/products/${product.id}`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -119,9 +119,74 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
     }
   }
 
+  const deleteProduct = async () => {
+    if (product) {
+      try {
+        const res = await axios.delete(`https://mmk-backend.onrender.com/products/${product.id}`)
+
+        if (res.data.message === 'Product deleted') {
+          setLoading(false)
+          navigate('/products')
+        }
+      } catch (err: unknown) {
+        const error = err as any
+        console.error(error.response?.data || error.message || error)
+      }
+    }
+  }
+
   return (
     <div className="container p-8">
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="font-semibold cursor-pointer" onClick={addImageMain}>
+            Attach Main Image
+            <Plus className='ml-2 inline bg-white rounded-full p-1 border border-gray-300' />
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleImageChangeMain}
+            className='hidden'
+            ref={fileInputRefMain}
+          />
+        </div>
+
+        {!mainImg && existingMainImg === '' &&
+          <div onClick={addImageMain} className='cursor-pointer w-[50%] aspect-square bg-white rounded-xl grid place-items-center'>
+            <ImagePlus />
+          </div>
+        }
+
+        {mainImg && (
+          <div className="relative w-[50%] aspect-square ">
+            <img
+              src={URL.createObjectURL(mainImg)}
+              alt='mainImg'
+              className="w-full h-full object-cover rounded-xl"
+            />
+            <X
+              onClick={() => removeImageMain()}
+              className="cursor-pointer text-black absolute top-2 right-2 rounded-full w-5 h-5 p-1 border bg-white"
+            />
+          </div>
+        )}
+
+        {existingMainImg && (
+          <div className="relative w-[50%] aspect-square ">
+            <img
+              src={existingMainImg}
+              alt='mainImg'
+              className="w-full h-full object-cover rounded-xl"
+            />
+            <X
+              onClick={() => removeImageMain()}
+              className="cursor-pointer text-black absolute top-2 right-2 rounded-full w-5 h-5 p-1 border bg-white"
+            />
+          </div>
+        )}
+
         <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="product-name">
           Product Name
         </label>
@@ -204,49 +269,6 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
         />
 
         <div>
-          <label className="font-semibold cursor-pointer" onClick={addImageMain}>
-            Attach Main Image
-            <Plus className='ml-2 inline bg-white rounded-full p-1 border border-gray-300' />
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handleImageChangeMain}
-            className='hidden'
-            ref={fileInputRefMain}
-          />
-        </div>
-
-        {mainImg && (
-          <div className="relative w-[25%] aspect-square ">
-            <img
-              src={URL.createObjectURL(mainImg)}
-              alt='mainImg'
-              className="w-full h-full object-cover rounded-xl"
-            />
-            <X
-              onClick={() => removeImageMain()}
-              className="cursor-pointer text-black absolute top-2 right-2 rounded-full w-5 h-5 p-1 border bg-white"
-            />
-          </div>
-        )}
-
-        {existingMainImg && (
-          <div className="relative w-[25%] aspect-square ">
-            <img
-              src={existingMainImg}
-              alt='mainImg'
-              className="w-full h-full object-cover rounded-xl"
-            />
-            <X
-              onClick={() => removeImageMain()}
-              className="cursor-pointer text-black absolute top-2 right-2 rounded-full w-5 h-5 p-1 border bg-white"
-            />
-          </div>
-        )}
-
-        <div>
           <label className="font-semibold cursor-pointer" onClick={addImage}>
             Attach Sub Images
             <Plus className='ml-2 inline bg-white rounded-full p-1 border border-gray-300' />
@@ -300,6 +322,12 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
         <button type="submit">
           {location.pathname.includes('new') ? 'Add Product' : 'Update Product'}
         </button>
+
+        {!location.pathname.includes('new') &&
+          <button type="button" className='float-right' onClick={deleteProduct}>
+            delete
+          </button>
+        }
       </form>
 
       {loading && <LoadingBar />}
