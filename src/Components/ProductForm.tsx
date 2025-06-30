@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom'
 import { X, Plus, ImagePlus } from "lucide-react"
 import axios from 'axios'
 import LoadingBar from './LoadingBar'
-import type { ProductProps, GroupedCategory } from '../types'
+import type { ProductProps, GroupedCategory, CategoryProps } from '../types'
 import { sortData, fetchCategory } from '../utils/categoryUtils'
 
 function ProductForm({ product }: { product: ProductProps | '' }) {
@@ -21,12 +21,14 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
   const [existingMainImg, setExistingMainImages] = useState<string>(product === '' ? '' : product.mainImg)
   const [images, setImages] = useState<File[]>([])
   const [mainImg, setMainImg] = useState<File | null>(null)
-  const [category, setCategory] = useState(product === '' ? '' : product.category)
+  const [categoryIndex, setCategoryIndex] = useState<number | string>(product === '' ? '' : product.category)
   const [categories, setCategories] = useState<GroupedCategory[]>([])
+  const [category, setCategory] = useState<CategoryProps[]>([])
 
   useEffect(() => {
     fetchCategory().then((data) => {
       setCategories(sortData(data))
+      setCategory(data)
       setLoading(false)
     })
   }, [])
@@ -80,8 +82,13 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
     formData.append('name', name)
     formData.append('price', price)
     formData.append('stock', stock)
-    formData.append('category', category)
     formData.append('description', description)
+    if (typeof categoryIndex === 'string') {
+      const matched = category.find((item) => item.name === categoryIndex)
+      if(matched) formData.append('category', (matched.id).toString())
+    } else {
+      formData.append('category', categoryIndex.toString())
+    }
     if (mainImg) {
       formData.append('mainImg', mainImg)
     }
@@ -215,8 +222,8 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
 
         <select
           required
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
+          value={typeof categoryIndex === 'number' && category[categoryIndex-1] ? category[categoryIndex - 1].name : categoryIndex}
+          onChange={(e) => setCategoryIndex(e.target.value)}
           className="w-full rounded-xl bg-white p-4 appearance-none"
         >
           <option value="" disabled>Select a category</option>
@@ -230,6 +237,7 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
             </optgroup>
           ))}
         </select>
+
 
         <div className='flex w-full space-x-4'>
           <div className='w-[50%]'>

@@ -1,7 +1,7 @@
 export type ProductProps = {
   id: number
   name: string
-  category: string
+  category: number
   stock: number
   price: number
   mainImg: string
@@ -22,4 +22,13 @@ export type GroupedCategory = {
   name: string
   order: number
   children: CategoryProps[]
+}
+
+export type UserProps = {
+  id: string
+  name:string
+  avatar_url: string
+  created_at: string
+  email: string
+  password: string
 }
