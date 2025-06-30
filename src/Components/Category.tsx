@@ -177,12 +177,12 @@ export default function Category() {
   const updateCategory = async () => {
     setUpdating(true)
     try {
-      const res = await axios.post('https://mmk-backend.onrender.com/replace', array, {
+      const res = await axios.post('https://mmk-backend.onrender.com/category/replace', array, {
         headers: {
           'Content-Type': 'application/json',
         },
       })
-
+      
       if (res.data) {
         setUpdating(false)
       }
