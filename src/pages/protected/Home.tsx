@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 
 function Home() {
-  const [stats, setStats] = useState({
-    totalSales: 0,
-    totalOrders: 0,
-    totalCustomers: 0,
-    topProducts: [],
-  })
+  // const [stats, setStats] = useState({
+  //   totalSales: 0,
+  //   totalOrders: 0,
+  //   totalCustomers: 0,
+  //   topProducts: [],
+  // })
 
   useEffect(() => {
     // const fetchStats = async () => {
