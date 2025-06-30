@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { ArrowDown01, ArrowDown10, ArrowDownAZ, ArrowDownZA, Image } from 'lucide-react'
+import { ArrowDown01, ArrowDown10, ArrowDownAZ, ArrowDownZA } from 'lucide-react'
 
 function Order() {
   const [loading, setLoading] = useState<boolean>(true)
