@@ -46,19 +46,19 @@ export default function Register() {
       <form onSubmit={handleSubmit} className='flex flex-col gap-4 w-[400px]'>
         <div className='bg-white p-3 rounded-xl flex'>
           <CircleUser className='inline w-5 mr-2 text-gray-400' />
-          <input className='w-[330px]' value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" />
+          <input className='w-[330px] outline-none' value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" />
         </div>
         <div className='bg-white p-3 rounded-xl flex'>
           <AtSign className='inline w-5 mr-2 text-gray-400' />
-          <input className='w-[330px]' type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
+          <input className='w-[330px] outline-none' type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
         </div>
         <div className='bg-white p-3 rounded-xl flex'>
           <RectangleEllipsis className='inline w-5 mr-2 text-gray-400' />
-          <input className='w-[330px]' type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" />
+          <input className='w-[330px] outline-none' type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" />
         </div>
         <div className='bg-white p-3 rounded-xl flex'>
           <RectangleEllipsis className='inline w-5 mr-2 text-gray-400' />
-          <input className='w-[330px]' type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirm Password" />
+          <input className='w-[330px] outline-none' type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirm Password" />
         </div>
         {error && <p className='text-red-600 text-sm'>{error}</p>}
         <button type="submit">Sign in</button>
