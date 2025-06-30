@@ -37,7 +37,7 @@ export default function Category() {
     }
 
     for (let i = 0; i < array.length; i++) {
-      if (array[i] !== arrayInit[i]) {
+      if (array[i].name !== arrayInit[i].name) {
         setChangeDetected(true)
         return
       }
@@ -203,15 +203,15 @@ export default function Category() {
         <button disabled={!changeDetected} onClick={updateCategory}>SAVE</button>
       </div>
 
-      <div className="mt-2">
+      <div className="mt-4">
         {categories.map((group) => (
           <div key={group.id} className="mb-6">
-            <div className="flex justify-between gap-2 bg-white w-full p-4 rounded-full shadow-xl">
+            <div className="flex justify-between gap-2 border border-gray-400 w-full p-4 rounded-full shadow-md">
               <strong className="inline"><CategoryName name={group.name} id={group.id} setArray={setArray} /></strong>
               <div className="flex items-center">
-                {products.filter(p => group.children.some(child => child.name === p.category)).length === 0 ?
+                {products.filter(p => group.children.some(child => child.id === p.category)).length === 0 ?
                   <Trash2 onClick={() => deleteCategory(group.id)} className="cursor-pointer inline mx-1 p-1 border-2 rounded-full w-7 h-7 border-red-300 text-red-500" /> :
-                  <span className="mx-2">{products.filter(p => group.children.some(child => child.name === p.category)).length}</span>
+                  <span className="mx-2">{products.filter(p => group.children.some(child => child.id === p.category)).length}</span>
                 }
                 <ChevronUp onClick={() => moveGroup(group.id, 'up')} className="cursor-pointer inline mx-1 p-1 border-2 rounded-full w-7 h-7" />
                 <ChevronDown onClick={() => moveGroup(group.id, 'down')} className="cursor-pointer inline mx-1 p-1 border-2 rounded-full w-7 h-7" />
@@ -221,13 +221,13 @@ export default function Category() {
             <ul className="ml-4">
               {group.children.map((sub) => (
                 <div key={sub.id}>
-                  <div className="ml-8 w-1 h-3 bg-white"></div>
-                  <li className="items-center gap-2 bg-white w-94 ml-2 px-4 py-3 rounded-full flex justify-between shadow-xl">
+                  <div className="ml-8 w-1 h-3 bg-gray-300"></div>
+                  <li className="items-center gap-2 border border-gray-400 w-94 ml-2 px-4 py-3 rounded-full flex justify-between shadow-md">
                     <CategoryName name={sub.name} id={sub.id} setArray={setArray} />
                     <div className="flex items-center">
-                      {products.filter(p => p.category === sub.name).length === 0 ?
+                      {products.filter(p => p.category === sub.id).length === 0 ?
                         <Trash2 onClick={() => deleteSubcategory(group.id, sub.id)} className="cursor-pointer inline mx-1 p-1 border rounded-full border-red-300 text-red-500" /> :
-                        <span className="mx-2">{products.filter(p => p.category === sub.name).length}</span>
+                        <span className="mx-2">{products.filter(p => p.category === sub.id).length}</span>
                       }
                       <ChevronUp onClick={() => moveSubcategory(group.id, sub.id, 'up')} className="cursor-pointer inline mx-1 p-1 border rounded-full" />
                       <ChevronDown onClick={() => moveSubcategory(group.id, sub.id, 'down')} className="cursor-pointer inline mx-1 p-1 border rounded-full" />
@@ -241,9 +241,9 @@ export default function Category() {
 
         {loading ?
           Array.from({ length: 10 }).map((_, i) => (
-            <div key={i} className='animate-pulse bg-white h-14 mb-4 w-full p-4 rounded-full shadow-xl'></div>
+            <div key={i} className='animate-pulse border h-14 mb-4 w-full p-4 rounded-full shadow-xl'></div>
           )) :
-          <div className="cursor-pointer flex gap-2 bg-yellow-300 w-full p-4 rounded-full shadow-xl" onClick={addcategory}>
+          <div className="cursor-pointer flex gap-2 bg-yellow-300 w-full p-4 mb-4 rounded-full shadow-xl" onClick={addcategory}>
             <Plus className="w-5" /> <p className="inline text-black font-medium">add new Category Group</p>
           </div>
         }
