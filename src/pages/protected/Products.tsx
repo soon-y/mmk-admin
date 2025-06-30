@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import type { ProductProps, GroupedCategory } from '../types'
+import type { ProductProps, GroupedCategory } from '../../types'
 import { ArrowDown01, ArrowDown10, ArrowDownAZ, ArrowDownZA, Image } from 'lucide-react'
-import { sortData, fetchCategory } from "../utils/categoryUtils"
-import { fetchProducts } from '../utils/productUtils'
+import { sortData, fetchCategory } from "../../utils/categoryUtils"
+import { fetchProducts } from '../../utils/productUtils'
 
 function Products() {
   const navigate = useNavigate()
@@ -13,11 +13,13 @@ function Products() {
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
   const [categoryFilter, setCategoryFilter] = useState('')
   const [categories, setCategories] = useState<GroupedCategory[]>([])
+  const [category, setCategory] = useState<GroupedCategory[]>([])
 
   useEffect(() => {
     Promise.all([fetchCategory(), fetchProducts()])
       .then(([categoryData, productData]) => {
         setCategories(sortData(categoryData))
+        setCategory(categoryData)
         setProducts(productData)
       })
       .catch((err) => {
@@ -44,7 +46,7 @@ function Products() {
   }
 
   const sortedProducts = [...products]
-    .filter(p => !categoryFilter || p.category === categoryFilter)
+    .filter(p => !categoryFilter || category[p.category-1].name === categoryFilter)
     .sort((a, b) => {
       if (!sortBy) return 0
       const valA = a[sortBy]
@@ -91,7 +93,7 @@ function Products() {
         <div onClick={() => navigate(`/product/${product.id}`)} key={product.id}
           className='grid grid-cols-[60px_140px_1fr_10%_10%_120px] gap-2 items-center border-b border-gray-300 cursor-pointer'>
           <p className='pl-4'>{product.id}</p>
-          <p className='pl-5'>{product.category}</p>
+          <p className='pl-5'>{category[product.category-1].name}</p>
           <p className='pl-4'>{product.name}</p>
           <p className='pl-4'>{product.price}</p>
           <p className='pl-4'>{product.stock}</p>

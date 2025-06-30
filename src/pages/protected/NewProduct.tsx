@@ -1,4 +1,4 @@
-import ProductForm from '../Components/ProductForm'
+import ProductForm from '../../Components/ProductForm'
 
 function NewProduct() {
 
