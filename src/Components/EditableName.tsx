@@ -29,11 +29,11 @@ export default function EditableName({ name, id, arrayLength, setArray }: { name
         <div className="flex justify-between items-center">
           <div className="flex">
             <SquareCheckBig onClick={updateName} className="w-4 mr-2 cursor-pointer text-gray-400 animate-bounce" />
-            <input style={{ width: `${newValue.length * 1.5 || 1}ch` }}
+            <input style={{ width: `${newValue.length * 1.3 || 1}ch` }}
               type="text"
               value={newValue}
               onChange={(e) => setNewValue(e.target.value)}
-              className="outline-none text-gray-400 bg-black"
+              className="outline-none text-gray-400"
               onKeyDown={(e) => {
                 if (e.key === 'Enter') { updateName() }
               }}
