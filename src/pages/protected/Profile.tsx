@@ -42,13 +42,13 @@ export default function Profile() {
       ) : user ? (
         <div className='flex flex-col items-center gap-1'>
           <h1 className='text-2xl font-bold'>Welcome, {user.name}</h1>
-          <img className='w-[50%] rounded-full my-4' src={user.avatar_url} alt={`${user.name}'s avatar`} />
+          <img className='w-[50%] aspect-square rounded-full my-4' src={user.avatar_url} alt={`${user.name}'s avatar`} />
           <p>{user.email}</p>
           <p>Created at {formatted(user.created_at)}</p>
           <button className='my-4' onClick={logout}>Log out</button>
         </div>
       ) : (
-        <div className='flex flex-col items-center gap-5'>
+        <div className='flex flex-col items-center gap-5 w-full'>
           <h1 className='w-50 h-8 bg-gray-200 rounded-md'></h1>
           <div className='w-[50%] aspect-square bg-gray-200 rounded-full'></div>
           <div className='w-40 h-6 bg-gray-200 rounded-md'></div>
