@@ -17,8 +17,6 @@ export default function EditableName({ name, id, arrayLength, setArray }: { name
   useEffect(() => {
     setNewValue(name)
     setEditable(false)
-
-    console.log(name)
   }, [name])
 
   const deleteArray = () => {
