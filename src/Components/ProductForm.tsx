@@ -213,7 +213,7 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
         </label>
         <input
           id="product-name"
-          className="w-full rounded-xl bg-white p-4"
+          className="w-full rounded-xl bg-white px-4 py-3"
           type="text"
           placeholder="Product Name"
           value={name}
@@ -229,7 +229,7 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
           required
           value={typeof categoryIndex === 'number' && category[categoryIndex - 1] ? category[categoryIndex - 1].name : categoryIndex}
           onChange={(e) => setCategoryIndex(e.target.value)}
-          className="w-full rounded-xl bg-white p-4 appearance-none"
+          className="w-full rounded-xl bg-white px-4 py-3 appearance-none"
         >
           <option value="" disabled>Select a category</option>
           {categories.map((group) => (
@@ -251,7 +251,7 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
             </label>
             <input
               id="product-price"
-              className="w-full rounded-xl bg-white p-4"
+              className="w-full rounded-xl bg-white px-4 py-3"
               type="number"
               placeholder="Price"
               value={price}
@@ -266,7 +266,7 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
             </label>
             <input
               id="product-stock"
-              className="w-full rounded-xl bg-white p-4"
+              className="w-full rounded-xl bg-white px-4 py-3"
               type="number"
               placeholder="Stock"
               value={stock}
@@ -279,9 +279,9 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
         <div className='flex w-full space-x-4'>
           <div className='w-[50%]'>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Size <Plus className='ml-2 inline bg-white rounded-full p-1 border border-gray-300' onClick={() => { setSize(prev => [...prev, 'one size']) }} />
+              Size <Plus className='cursor-pointer ml-2 inline bg-white rounded-full p-1 border border-gray-300' onClick={() => { setSize(prev => [...prev, 'one size']) }} />
             </label>
-            <div className='bg-white p-4 rounded-xl my-2'>
+            <div className='bg-white px-4 py-3 rounded-xl my-2'>
               {size.map((item, index) => (
                 <EditableName name={item} id={index} arrayLength={size.length} setArray={setSize} key={index} />
               ))}
@@ -290,9 +290,9 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
 
           <div className='w-[50%]'>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Color <Plus className='ml-2 inline bg-white rounded-full p-1 border border-gray-300' onClick={() => { setColor(prev => [...prev, 'one color']) }} />
+              Color <Plus className='cursor-pointer ml-2 inline bg-white rounded-full p-1 border border-gray-300' onClick={() => { setColor(prev => [...prev, 'one color']) }} />
             </label>
-            <div className='bg-white p-4 rounded-xl my-2'>
+            <div className='bg-white px-4 py-3 rounded-xl my-2'>
               {color.map((item, index) => (
                 <EditableName name={item} id={index} arrayLength={color.length} setArray={setColor} key={index} />
               ))}
@@ -304,7 +304,7 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
           Description
         </label>
         <textarea
-          className="w-full rounded-xl bg-white p-4"
+          className="w-full rounded-xl bg-white px-4 py-3"
           placeholder="Description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
