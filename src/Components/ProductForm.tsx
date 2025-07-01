@@ -6,6 +6,7 @@ import axios from 'axios'
 import LoadingBar from './LoadingBar'
 import type { ProductProps, GroupedCategory, CategoryProps } from '../types'
 import { sortData, fetchCategory } from '../utils/categoryUtils'
+import EditableName from './EditableName'
 
 function ProductForm({ product }: { product: ProductProps | '' }) {
   const location = useLocation()
@@ -16,6 +17,8 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
   const [name, setName] = useState<string>(product === '' ? '' : product.name)
   const [price, setPrice] = useState<string>(product === '' ? '' : product.price.toString())
   const [stock, setStock] = useState<string>(product === '' ? '' : product.stock.toString())
+  const [size, setSize] = useState<string[]>(product === '' ? ['one size'] : product.size.split('/'))
+  const [color, setColor] = useState<string[]>(product === '' ? ['one color'] : product.color.split('/'))
   const [description, setDescription] = useState<string>(product === '' ? '' : product.description)
   const [existingImages, setExistingImages] = useState<string[]>(product === '' ? [] : product.images)
   const [existingMainImg, setExistingMainImages] = useState<string>(product === '' ? '' : product.mainImg)
@@ -83,9 +86,11 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
     formData.append('price', price)
     formData.append('stock', stock)
     formData.append('description', description)
+    formData.append('size', size.join('/'))
+    formData.append('color', color.join('/'))
     if (typeof categoryIndex === 'string') {
       const matched = category.find((item) => item.name === categoryIndex)
-      if(matched) formData.append('category', (matched.id).toString())
+      if (matched) formData.append('category', (matched.id).toString())
     } else {
       formData.append('category', categoryIndex.toString())
     }
@@ -222,7 +227,7 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
 
         <select
           required
-          value={typeof categoryIndex === 'number' && category[categoryIndex-1] ? category[categoryIndex - 1].name : categoryIndex}
+          value={typeof categoryIndex === 'number' && category[categoryIndex - 1] ? category[categoryIndex - 1].name : categoryIndex}
           onChange={(e) => setCategoryIndex(e.target.value)}
           className="w-full rounded-xl bg-white p-4 appearance-none"
         >
@@ -268,6 +273,30 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
               onChange={(e) => Number(e.target.value) > 0 ? setStock(e.target.value) : ''}
               required
             />
+          </div>
+        </div>
+
+        <div className='flex w-full space-x-4'>
+          <div className='w-[50%]'>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Size <Plus className='ml-2 inline bg-white rounded-full p-1 border border-gray-300' onClick={() => { setSize(prev => [...prev, 'one size']) }} />
+            </label>
+            <div className='bg-white p-4 rounded-xl my-2'>
+              {size.map((item, index) => (
+                <EditableName name={item} id={index} arrayLength={size.length} setArray={setSize} key={index} />
+              ))}
+            </div>
+          </div>
+
+          <div className='w-[50%]'>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Color <Plus className='ml-2 inline bg-white rounded-full p-1 border border-gray-300' onClick={() => { setColor(prev => [...prev, 'one color']) }} />
+            </label>
+            <div className='bg-white p-4 rounded-xl my-2'>
+              {color.map((item, index) => (
+                <EditableName name={item} id={index} arrayLength={color.length} setArray={setColor} key={index} />
+              ))}
+            </div>
           </div>
         </div>
 

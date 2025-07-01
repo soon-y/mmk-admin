@@ -7,6 +7,8 @@ export type ProductProps = {
   mainImg: string
   images: string[]
   description: string
+  size: string
+  color: string
 }
 
 export type CategoryProps = {
