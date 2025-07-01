@@ -241,7 +241,7 @@ export default function Category() {
 
         {loading ?
           Array.from({ length: 10 }).map((_, i) => (
-            <div key={i} className='animate-pulse border h-14 mb-4 w-full p-4 rounded-full shadow-xl'></div>
+            <div key={i} className='animate-pulse border border-gray-300 h-14 mb-4 w-full p-4 rounded-full shadow-xl'></div>
           )) :
           <div className="cursor-pointer flex gap-2 bg-yellow-300 w-full p-4 mb-4 rounded-full shadow-xl" onClick={addcategory}>
             <Plus className="w-5" /> <p className="inline text-black font-medium">add new Category Group</p>
