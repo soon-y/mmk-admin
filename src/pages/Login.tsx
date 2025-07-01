@@ -2,25 +2,30 @@ import { useState } from 'react'
 import axios from 'axios'
 import { RectangleEllipsis, CircleUser } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import LoadingBar from '../Components/LoadingBar'
 
 export default function Login() {
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const navigate = useNavigate()
-  const [error, setError] = useState('')
+  const [error, setError] = useState<string>('')
+  const [loading, setLoading] = useState<boolean>(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     try {
+      setLoading(true)
       const res = await axios.post('https://mmk-backend.onrender.com/auth/login', { email, password })
       if (res.status === 201 || res.status === 200) {
         localStorage.setItem('token', res.data.access_token)
+        setLoading(false)
         navigate('/')
       } else {
         setError('Unexpected response from server.')
       }
     } catch (err) {
+      setLoading(false)
       if (axios.isAxiosError(err)) {
         const status = err.response?.status
         if (status === 401) {
@@ -39,12 +44,12 @@ export default function Login() {
     <div className='container flex flex-col justify-center items-center'>
       <p className='font-bold text-2xl mb-4'>LOGIN</p>
       <form onSubmit={handleSubmit} className='flex flex-col gap-4 w-[400px]'>
-        <div className='bg-white p-3 rounded-xl flex'>
+        <div className='bg-white p-2 rounded-xl flex'>
           <CircleUser className='inline w-5 mr-2 text-gray-400' />
           <input className='w-[330px] outline-none' type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" />
         </div>
 
-        <div className='bg-white p-3 rounded-xl flex'>
+        <div className='bg-white p-2 rounded-xl flex'>
           <RectangleEllipsis className='inline w-5 mr-2 text-gray-400' />
           <input className='w-[330px] outline-none' type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" />
         </div>
@@ -65,6 +70,8 @@ export default function Login() {
         <div><CircleUser className='inline w-5 mr-2' /> admin@mmk.com </div>
         <div><RectangleEllipsis className='inline w-5 mr-2' />admin123456789</div>
       </div>
+
+      {loading && <LoadingBar />}
     </div>
   )
 }
