@@ -3,6 +3,8 @@ import axios from 'axios'
 import { RectangleEllipsis, CircleUser } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import LoadingBar from '../Components/LoadingBar'
+import { fetchMe } from '../utils/profileUtils'
+import { useAuth } from '../context/auth'
 
 export default function Login() {
   const [email, setEmail] = useState<string>('')
@@ -10,6 +12,7 @@ export default function Login() {
   const navigate = useNavigate()
   const [error, setError] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
+  const { setUser } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -19,8 +22,13 @@ export default function Login() {
       const res = await axios.post('https://mmk-backend.onrender.com/auth/login', { email, password })
       if (res.status === 201 || res.status === 200) {
         localStorage.setItem('token', res.data.access_token)
-        setLoading(false)
-        navigate('/')
+        const userData = await fetchMe()
+
+        if (userData && userData !== false) {
+          setUser(userData)
+          setLoading(false)
+          navigate('/')
+        }
       } else {
         setError('Unexpected response from server.')
       }

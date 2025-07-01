@@ -2,36 +2,22 @@ import { Boxes, PackagePlus, Truck, Settings } from "lucide-react"
 import type { ReactNode } from "react"
 import { Link } from 'react-router-dom'
 import { useLocation } from 'react-router-dom'
-import { useEffect, useState } from "react"
-import { useNavigate } from 'react-router-dom'
-import { fetchMe } from "../utils/profileUtils"
-import type { UserProps } from "../types"
+import { useAuth } from "../context/auth"
 
 function Navigation() {
-  const navigate = useNavigate()
+  const { user } = useAuth()
   const location = useLocation()
-  const [user, setUser] = useState<UserProps>()
   const menus: { link: string, label: string, icon: ReactNode }[] = [
     { link: 'products', label: 'Products', icon: <Boxes strokeWidth={1} /> },
     { link: 'new-product', label: 'New Product', icon: <PackagePlus strokeWidth={1} /> },
     { link: 'orders', label: 'Order', icon: <Truck strokeWidth={1} /> },
     { link: 'settings', label: 'Settings', icon: <Settings strokeWidth={1} /> },
-    { link: 'profile', label: 'Profile', icon: user ? <img className="w-6 rounded-full" src={user?.avatar_url} /> : <div className="w-6 aspect-square bg-gray-200 rounded-full animate-pulse"></div> },
+    { link: 'profile', label: 'Profile', icon: user ? <img className="w-6 rounded-full" src={user.avatar_url} /> : <div className="w-6 aspect-square bg-gray-200 rounded-full animate-pulse"></div> },
   ]
 
   const active = (path: string) => {
     return location.pathname.includes(path)
   }
-
-  useEffect(() => {
-    fetchMe().then((result) => {
-      if (result === false) {
-        navigate('/login')
-      } else {
-        setUser(result)
-      }
-    })
-  }, [])
 
   return (
     <div className='fixed border-r border-r-[#eeeeee] w-[200px] h-[100vh] bg-white p-4'>
