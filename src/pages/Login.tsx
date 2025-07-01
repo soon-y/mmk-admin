@@ -67,8 +67,8 @@ export default function Login() {
 
       <div className='text-gray-500 p-4 my-2 rounded-md flex flex-col items-center'>
         Please use the following credentials: <br />
-        <div><CircleUser className='inline w-5 mr-2' /> admin@mmk.com </div>
-        <div><RectangleEllipsis className='inline w-5 mr-2' />admin123456789</div>
+        <div><CircleUser className='inline w-5 mr-2' /> member@mmk.com </div>
+        <div><RectangleEllipsis className='inline w-5 mr-2' />mmk123456789</div>
       </div>
 
       {loading && <LoadingBar />}
