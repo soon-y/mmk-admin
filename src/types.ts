@@ -33,4 +33,5 @@ export type UserProps = {
   created_at: string
   email: string
   password: string
+  admin: boolean
 }

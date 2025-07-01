@@ -25,12 +25,12 @@ function Settings() {
               <img className="w-16 rounded-full" src={member.avatar_url} />
               <div className="flex flex-col ml-4 justify-center">
                 <strong>{member.name}</strong>
-                <p>{member.email}</p>
+                <p className="text-sm">{member.email}</p>
+                <p className="text-sm">{member.admin? 'Admin' : 'Member'}</p>
               </div>
             </div>
           ))}
         </div>
-
       </div>
 
       <div className={styles}>

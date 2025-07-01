@@ -42,9 +42,10 @@ export default function Profile() {
       ) : user ? (
         <div className='flex flex-col items-center gap-1'>
           <h1 className='text-2xl font-bold'>Welcome, {user.name}</h1>
-          <img className='w-[50%] aspect-square rounded-full my-4' src={user.avatar_url} alt={`${user.name}'s avatar`} />
           <p>{user.email}</p>
-          <p>Created at {formatted(user.created_at)}</p>
+          <img className='w-[50%] aspect-square rounded-full my-4' src={user.avatar_url} alt={`${user.name}'s avatar`} />
+          <p>{user.admin ? 'Admin' : 'Member'}</p>
+          <p>created on {formatted(user.created_at)}</p>
           <button className='my-4' onClick={logout}>Log out</button>
         </div>
       ) : (
