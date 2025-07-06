@@ -35,7 +35,7 @@ export const fetchCategory = async () => {
 
 export const updateCategory = async (data: FormData) => {
   try {
-    const res = await axios.post('http://localhost:3000/category/replace', data)
+    const res = await axios.post('https://mmk-backend.onrender.com/category/replace', data)
     return res
   } catch (err: unknown) {
     const error = err as any

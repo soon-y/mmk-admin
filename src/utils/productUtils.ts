@@ -24,7 +24,7 @@ export const groupingImages = (existingImagesCount: string[], images: string[]) 
 
 export const postProducts = async (formData: FormData) => {
   try {
-    const res = await axios.post('http://localhost:3000/products', formData, {
+    const res = await axios.post('https://mmk-backend.onrender.com/products', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -38,7 +38,7 @@ export const postProducts = async (formData: FormData) => {
 
 export const updateProduct = async (id: number, formData: FormData) => {
   try {
-    const res = await axios.post(`http://localhost:3000/products/${id}`, formData, {
+    const res = await axios.post(`https://mmk-backend.onrender.com/products/${id}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
