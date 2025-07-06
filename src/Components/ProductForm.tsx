@@ -5,7 +5,7 @@ import { X, ImagePlus } from "lucide-react"
 import LoadingBar from './LoadingBar'
 import type { ProductProps, CategoryProps } from '../types'
 import { fetchCategory } from '../utils/categoryUtils'
-import EditableName from './EditableName'
+import EditableName from './ui/EditableName'
 import { Palette } from './Palette'
 import { groupingImages, postProducts, updateProduct, deleteProduct } from '../utils/productUtils'
 import Input from './ui/input'
