@@ -1,5 +1,5 @@
 import { useState } from "react"
-import type { CategoryProps } from "../types"
+import type { CategoryProps } from "../../types"
 import { PenBox, SquareCheckBig } from "lucide-react"
 
 export default function CategoryName({ name, id, setArray }: { name: string, id: number, setArray: React.Dispatch<React.SetStateAction<CategoryProps[]>> }) {

@@ -1,7 +1,13 @@
 import { useState, useEffect } from "react"
 import { PenBox, SquareCheckBig, MinusCircle } from "lucide-react"
 
-export default function EditableName({ name, id, arrayLength, setArray }: { name: string, id: number, arrayLength: number, setArray: React.Dispatch<React.SetStateAction<string[]>> }) {
+export default function EditableName({ 
+  name, id, arrayLength, setArray, setDeletedIndex
+ }: { 
+  name: string, id: number, arrayLength: number, 
+  setArray: React.Dispatch<React.SetStateAction<string[]>>
+  setDeletedIndex: React.Dispatch<React.SetStateAction<number | null>>
+ }) {
   const [newValue, setNewValue] = useState<string>(name)
   const [editable, setEditable] = useState<boolean>(false)
 
@@ -20,13 +26,14 @@ export default function EditableName({ name, id, arrayLength, setArray }: { name
   }, [name])
 
   const deleteArray = () => {
+    setDeletedIndex(id)
     setArray(prev => prev.filter((_, i) => i !== id))
   }
 
   return (
     <div>
       {editable ?
-        <div className="flex justify-between items-center">
+        <div className="flex items-center">
           <div className="flex">
             <SquareCheckBig onClick={updateName} className="w-4 mr-2 cursor-pointer text-gray-400 animate-bounce" />
             <input style={{ width: `${newValue.length * 1.3 || 1}ch` }}
@@ -39,15 +46,14 @@ export default function EditableName({ name, id, arrayLength, setArray }: { name
               }}
             />
           </div>
-          {arrayLength > 1 && <MinusCircle className="w-5 text-gray-600 cursor-pointer" strokeWidth={1} onClick={deleteArray} />}
         </div>
         :
-        <div className="flex justify-between items-center" >
+        <div className="flex gap-2 items-center" >
           <div className="flex" onClick={() => setEditable(true)}>
             <PenBox className="w-4 mr-2 cursor-pointer" />
             <p>{newValue}</p>
           </div>
-          {arrayLength > 1 && <MinusCircle className="w-5 text-gray-600 cursor-pointer" strokeWidth={1} onClick={deleteArray} />}
+          {arrayLength > 1 && <MinusCircle className="inline w-5 text-red-500 cursor-pointer" strokeWidth={1} onClick={deleteArray} />}
         </div>
       }
     </div>
