@@ -1,373 +1,354 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useLocation } from 'react-router-dom'
-import { X, Plus, ImagePlus } from "lucide-react"
-import axios from 'axios'
+import { X, ImagePlus } from "lucide-react"
 import LoadingBar from './LoadingBar'
-import type { ProductProps, GroupedCategory, CategoryProps } from '../types'
-import { sortData, fetchCategory } from '../utils/categoryUtils'
+import type { ProductProps, CategoryProps } from '../types'
+import { fetchCategory } from '../utils/categoryUtils'
 import EditableName from './EditableName'
+import { Palette } from './Palette'
+import { groupingImages, postProducts, updateProduct, deleteProduct } from '../utils/productUtils'
+import Input from './ui/input'
+import TextArea from './ui/textArea'
+import CategorySelection from './ui/categorySelection'
+import Label from './ui/label'
+import PlusBtn from './ui/plusBtn'
 
 function ProductForm({ product }: { product: ProductProps | '' }) {
   const location = useLocation()
   const navigate = useNavigate()
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const fileInputRefMain = useRef<HTMLInputElement>(null)
+  const fileInputRefs = useRef<(HTMLInputElement | null)[]>([])
   const [loading, setLoading] = useState<boolean>(false)
   const [name, setName] = useState<string>(product === '' ? '' : product.name)
   const [price, setPrice] = useState<string>(product === '' ? '' : product.price.toString())
-  const [stock, setStock] = useState<string>(product === '' ? '' : product.stock.toString())
   const [size, setSize] = useState<string[]>(product === '' ? ['one size'] : product.size.split('/'))
   const [color, setColor] = useState<string[]>(product === '' ? ['one color'] : product.color.split('/'))
+  const [stock, setStock] = useState<number[][]>(product === '' ? [[0]] : product.stock.split('/').map(row => row.split(',').map(Number)))
+  const [colorHex, setColorHex] = useState<string[]>(product === '' ? ['#ffffff'] : product.colorHex.split('/'))
   const [description, setDescription] = useState<string>(product === '' ? '' : product.description)
-  const [existingImages, setExistingImages] = useState<string[]>(product === '' ? [] : product.images)
-  const [existingMainImg, setExistingMainImages] = useState<string>(product === '' ? '' : product.mainImg)
-  const [images, setImages] = useState<File[]>([])
-  const [mainImg, setMainImg] = useState<File | null>(null)
+  const [material, setMaterial] = useState<string>(product === '' ? '' : product.material)
+  const [measurement, setMeasurement] = useState<string>(product === '' ? '' : product.measurement)
+  const [existingImages, setExistingImages] = useState<string[][]>([])
+  const [images, setImages] = useState<File[][]>([])
+  const [imagesCount, setImagesCount] = useState<string[]>(['0'])
+  const [existingImagesCount, setExistingImagesCount] = useState<string[]>(product === '' ? ['0'] : product.imagesCount.split('/'))
   const [categoryIndex, setCategoryIndex] = useState<number | string>(product === '' ? '' : product.category)
-  const [categories, setCategories] = useState<GroupedCategory[]>([])
+  const [deletedColorIndex, setDeletedColorIndex] = useState<number | null>(null)
+  const [deletedSizeIndex, setDeletedSizeIndex] = useState<number | null>(null)
   const [category, setCategory] = useState<CategoryProps[]>([])
 
   useEffect(() => {
     fetchCategory().then((data) => {
-      setCategories(sortData(data))
       setCategory(data)
       setLoading(false)
     })
+
+    if (product) {
+      const groupedImages = groupingImages(existingImagesCount, product.images)
+      setExistingImages(groupedImages)
+      setImagesCount(Array(existingImagesCount.length).fill('0'))
+    }
   }, [])
 
-  const handleImageChangeMain = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      setMainImg(file)
-      setExistingMainImages('')
-    }
-  }
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const addImage = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const files = Array.from(e.target.files || [])
-    setImages(prev => [...prev, ...files])
+
+    setImages(prev => {
+      const temp = [...prev]
+      temp[index] = temp[index] ? [...temp[index], ...files] : [...files]
+      return temp
+    })
+
+    setImagesCount(prev =>
+      prev.map((count, i) =>
+        i === index ? (Number(count) + 1).toString() : count
+      )
+    )
+
     e.target.value = ''
   }
 
-  const removeImageMain = () => {
-    setMainImg(null)
-    setExistingMainImages('')
+  const removeImage = (colorIndex: number, imageIndex: number) => {
+    setImages(prev =>
+      prev.map((group, i) =>
+        i === colorIndex ? group.filter((_, j) => j !== imageIndex) : group
+      )
+    )
+
+    setImagesCount(prev =>
+      prev.map((count, i) =>
+        i === imageIndex ? (Number(count) - 1).toString() : count
+      )
+    )
   }
 
-  const removeImage = (index: number) => {
-    setImages(images => images.filter((_, i) => i !== index))
-  }
+  function removeExistingImage(colorIndex: number, imageIndex: number) {
+    setExistingImages(prev =>
+      prev.map((group, i) =>
+        i === colorIndex ? group.filter((_, j) => j !== imageIndex) : group
+      )
+    )
 
-  function removeExistingImage(indexToRemove: number) {
-    setExistingImages(existingImages.filter((_, i) => i !== indexToRemove))
-  }
-
-  const addImage = () => {
-    fileInputRef.current?.click()
-  }
-
-  const addImageMain = () => {
-    fileInputRefMain.current?.click()
+    setExistingImagesCount(prev =>
+      prev.map((count, i) =>
+        i === colorIndex ? (Number(count) - 1).toString() : count
+      )
+    )
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!(mainImg || existingMainImg)) {
-      alert('Please attach main image!')
-      return
-    } else {
-      setLoading(true)
-    }
-
     const formData = new FormData()
     formData.append('name', name)
     formData.append('price', price)
-    formData.append('stock', stock)
     formData.append('description', description)
+    formData.append('material', material)
+    formData.append('measurement', measurement)
     formData.append('size', size.join('/'))
     formData.append('color', color.join('/'))
+    formData.append('colorHex', colorHex.join('/'))
+    formData.append('stock', stock.join('/'))
+
     if (typeof categoryIndex === 'string') {
       const matched = category.find((item) => item.name === categoryIndex)
       if (matched) formData.append('category', (matched.id).toString())
     } else {
       formData.append('category', categoryIndex.toString())
     }
-    if (mainImg) {
-      formData.append('mainImg', mainImg)
-    }
-    Array.from(images).forEach((file) => {
-      formData.append('files', file)
-    })
 
     if (product === '') {
-      try {
-        const res = await axios.post('https://mmk-backend.onrender.com/products', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        })
+      images.flat().forEach(file => { formData.append('files', file) })
 
-        if (res.data) {
-          setLoading(false)
-          navigate('/products')
-        }
-      } catch (err: unknown) {
-        const error = err as any
-        console.error(error.response?.data || error.message || error)
+      if (imagesCount.includes('0')) {
+        alert('Please attach images!')
+        return
+      } else {
+        setLoading(true)
+        formData.append('imagesCount', imagesCount.join('/'))
       }
+
+      const res = await postProducts(formData)
+      if (res) {
+        setLoading(false)
+        navigate('/products')
+      } else {
+
+      }
+
     } else {
-      formData.append('existingMainImg', existingMainImg)
-      Array.from(existingImages).forEach((url) => {
-        formData.append('existingImages', url)
+      formData.append('originalOrderCount', existingImagesCount.join('/'))
+      formData.append('newOrderCount', imagesCount.join('/'))
+      const maxLength = Math.max(existingImagesCount.length, imagesCount.length)
+      const imgCounts: number[] = Array.from({ length: maxLength }, (_, i) => (Number(existingImagesCount[i] ?? 0)) + (Number(imagesCount[i] ?? 0)))
+      formData.append('imagesCount', imgCounts.join('/'))
+
+      if (imgCounts.includes(0)) {
+        alert('Please attach images!')
+        return
+      } else {
+        setLoading(true)
+      }
+
+      const flatImages = existingImages.flat()
+      if (flatImages.length > 0) {
+        flatImages.forEach(file => {
+          formData.append('existingImages', file)
+        })
+      } else {
+        formData.append('existingImages', '[]')
+      }
+
+      images.flat().forEach(file => {
+        formData.append('files', file)
       })
 
-      try {
-        const res = await axios.patch(`https://mmk-backend.onrender.com/products/${product.id}`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        })
+      const res = await updateProduct(product.id, formData)
+      if (res) {
+        setLoading(false)
+        navigate('/products')
+      } else {
 
-        if (res.data) {
-          setLoading(false)
-          navigate('/products')
-        }
-      } catch (err) {
-        console.error('Upload failed:', err)
       }
     }
   }
 
-  const deleteProduct = async () => {
+  const deleteAction = async () => {
     if (product) {
-      try {
-        const res = await axios.delete(`https://mmk-backend.onrender.com/products/${product.id}`)
+      const res = await deleteProduct(product.id)
 
-        if (res.data.message === 'Product deleted') {
-          setLoading(false)
-          navigate('/products')
-        }
-      } catch (err: unknown) {
-        const error = err as any
-        console.error(error.response?.data || error.message || error)
+      if (res && res.data.message === 'Product deleted') {
+        setLoading(false)
+        navigate('/products')
       }
     }
   }
+
+  const updateStock = (i: number, j: number, value: number) => {
+    setStock(prev =>
+      prev.map((row, rowIndex) =>
+        rowIndex === i
+          ? row.map((col, colIndex) => (colIndex === j ? value : col))
+          : row
+      )
+    )
+  }
+
+  useEffect(() => {
+    if (deletedSizeIndex !== null) { setStock(stock.filter((_, i) => i !== deletedSizeIndex)) }
+  }, [deletedSizeIndex])
+
+  useEffect(() => {
+    if (deletedColorIndex !== null) {
+      setStock(stock.map(row => row.filter((_, j) => j !== deletedColorIndex)))
+      setImages(images.map(row => row.filter((_, j) => j !== deletedColorIndex)))
+    }
+  }, [deletedColorIndex])
 
   return (
     <div className="container p-8">
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="font-semibold cursor-pointer" onClick={addImageMain}>
-            Attach Main Image
-            <Plus className='ml-2 inline bg-white rounded-full p-1 border border-gray-300' />
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handleImageChangeMain}
-            className='hidden'
-            ref={fileInputRefMain}
-          />
-        </div>
-
-        {!mainImg && existingMainImg === '' &&
-          <div onClick={addImageMain} className='cursor-pointer w-[50%] aspect-square bg-white rounded-xl grid place-items-center'>
-            <ImagePlus />
-          </div>
-        }
-
-        {mainImg && (
-          <div className="relative w-[50%] aspect-square ">
-            <img
-              src={URL.createObjectURL(mainImg)}
-              alt='mainImg'
-              className="w-full h-full object-cover rounded-xl"
-            />
-            <X
-              onClick={() => removeImageMain()}
-              className="cursor-pointer text-black absolute top-2 right-2 rounded-full w-5 h-5 p-1 border bg-white"
-            />
-          </div>
-        )}
-
-        {existingMainImg && (
-          <div className="relative w-[50%] aspect-square ">
-            <img
-              src={existingMainImg}
-              alt='mainImg'
-              className="w-full h-full object-cover rounded-xl"
-            />
-            <X
-              onClick={() => removeImageMain()}
-              className="cursor-pointer text-black absolute top-2 right-2 rounded-full w-5 h-5 p-1 border bg-white"
-            />
-          </div>
-        )}
-
-        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="product-name">
-          Product Name
-        </label>
-        <input
-          id="product-name"
-          className="w-full rounded-xl bg-white px-4 py-3"
-          type="text"
-          placeholder="Product Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-
-        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="product-name">
-          Category
-        </label>
-
-        <select
-          required
-          value={typeof categoryIndex === 'number' && category[categoryIndex - 1] ? category[categoryIndex - 1].name : categoryIndex}
-          onChange={(e) => setCategoryIndex(e.target.value)}
-          className="w-full rounded-xl bg-white px-4 py-3 appearance-none"
-        >
-          <option value="" disabled>Select a category</option>
-          {categories.map((group) => (
-            <optgroup label={group.name} key={group.id}>
-              {group.children.map((sub) => (
-                <option value={sub.name} key={sub.id}>
-                  {sub.name}
-                </option>
-              ))}
-            </optgroup>
-          ))}
-        </select>
-
-
-        <div className='flex w-full space-x-4'>
-          <div className='w-[50%]'>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="product-price">
-              Price
-            </label>
-            <input
-              id="product-price"
-              className="w-full rounded-xl bg-white px-4 py-3"
-              type="number"
-              placeholder="Price"
-              value={price}
-              onChange={(e) => Number(e.target.value) > 0 ? setPrice(e.target.value) : ''}
-              required
-            />
+        <Label name='Product Name' />
+        <Input label='Product Name' type='text' value={name} setValue={setName} />
+        <div className='grid md:grid-cols-2 gap-4'>
+          <div>
+            <Label name='Category' />
+            <CategorySelection disabled={true} option='Select a category' noPadding={false}
+              setValue={setCategoryIndex}
+              setLoading={setLoading}
+              categoryIndex={categoryIndex} />
           </div>
 
-          <div className='w-[50%]'>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="product-stock">
-              Stock
-            </label>
-            <input
-              id="product-stock"
-              className="w-full rounded-xl bg-white px-4 py-3"
-              type="number"
-              placeholder="Stock"
-              value={stock}
-              onChange={(e) => Number(e.target.value) > 0 ? setStock(e.target.value) : ''}
-              required
-            />
+          <div>
+            <Label name='Price' />
+            <Input label='Price (€)' type='number' value={price} setValue={setPrice} />
           </div>
-        </div>
 
-        <div className='flex w-full space-x-4'>
-          <div className='w-[50%]'>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Size <Plus className='cursor-pointer ml-2 inline bg-white rounded-full p-1 border border-gray-300' onClick={() => { setSize(prev => [...prev, 'one size']) }} />
-            </label>
-            <div className='bg-white px-4 py-3 rounded-xl my-2'>
+          <div>
+            <Label name='Size' />
+            <PlusBtn onClick={() => {
+              setSize(prev => [...prev, 'one size ' + prev.length])
+              setStock(prev => [...prev, new Array(color.length).fill(0)])
+            }} />
+            <div className='bg-white px-4 py-2 rounded-xl my-2'>
               {size.map((item, index) => (
-                <EditableName name={item} id={index} arrayLength={size.length} setArray={setSize} key={index} />
+                <EditableName name={item} id={index} arrayLength={size.length} setArray={setSize} key={index} setDeletedIndex={setDeletedSizeIndex} />
               ))}
             </div>
           </div>
 
-          <div className='w-[50%]'>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Color <Plus className='cursor-pointer ml-2 inline bg-white rounded-full p-1 border border-gray-300' onClick={() => { setColor(prev => [...prev, 'one color']) }} />
-            </label>
-            <div className='bg-white px-4 py-3 rounded-xl my-2'>
+          <div>
+            <Label name='Color' />
+            <PlusBtn onClick={() => {
+              setColor(prev => [...prev, 'one color ' + prev.length])
+              setColorHex(prev => [...prev, '#ffffff'])
+              setStock(prev => prev.map(row => [...row, 0]))
+              setImages(prev => [...prev, []])
+              setImagesCount(prev => [...prev, '0'])
+            }} />
+
+            <div className='bg-white px-4 py-2 rounded-xl my-2 grid gap-2'>
               {color.map((item, index) => (
-                <EditableName name={item} id={index} arrayLength={color.length} setArray={setColor} key={index} />
+                <div key={index} className='grid md:grid-cols-2 gap-2 items-center'>
+                  <div>
+                    <EditableName name={item} id={index} arrayLength={color.length} setArray={setColor} key={index} setDeletedIndex={setDeletedColorIndex} />
+                    <div className='flex gap-2 items-center mt-1'>
+                      <div className='w-4 aspect-square rounded-full border border-gray-400' style={{ backgroundColor: colorHex[index] }}></div>
+                      <p className='text-sm'>{colorHex[index]}</p>
+                    </div>
+                  </div>
+                  <Palette index={index} setColorHex={setColorHex} initial={colorHex[index]} />
+                </div>
               ))}
             </div>
           </div>
         </div>
 
-        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="product-Description">
-          Description
-        </label>
-        <textarea
-          className="w-full rounded-xl bg-white px-4 py-3"
-          placeholder="Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          required
-        />
-
+        <Label name='Stock' />
         <div>
-          <label className="font-semibold cursor-pointer" onClick={addImage}>
-            Attach Sub Images
-            <Plus className='ml-2 inline bg-white rounded-full p-1 border border-gray-300' />
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handleImageChange}
-            className='hidden'
-            ref={fileInputRef}
-          />
+          {size.map((s, i) => (
+            color.map((c, j) => (
+              <div key={`${i}-${j}`} className="grid md:grid-cols-2 gap-2 my-2 items-center">
+                <p>{s} - {c}</p>
+                <input
+                  className="w-full rounded-xl bg-white px-4 py-2"
+                  type="number"
+                  value={stock[i][j]}
+                  onChange={(e) => updateStock(i, j, Number(e.target.value))}
+                  required
+                />
+              </div>
+            ))
+          ))}
         </div>
 
-        {images.length > 0 && (
-          <div className="flex gap-2 flex-wrap">
-            {images.map((file, index) => (
-              <div key={index} className="relative w-[25%] aspect-square ">
-                <img
-                  src={URL.createObjectURL(file)}
-                  alt={`attachment-${index}`}
-                  className="w-full h-full object-cover rounded-xl"
-                />
-                <X
-                  onClick={() => removeImage(index)}
-                  className="cursor-pointer text-black absolute top-2 right-2 rounded-full w-5 h-5 p-1 border bg-white"
-                />
-              </div>
-            ))}
-          </div>
-        )}
+        <TextArea label='Description' value={description} setValue={setDescription} />
+        <TextArea label='Material' value={material} setValue={setMaterial} />
+        <TextArea label='Measurement' value={measurement} setValue={setMeasurement} />
 
-        {existingImages.length > 0 && (
-          <div className="flex gap-2 flex-wrap mt-4">
-            {existingImages.map((url, index) => (
-              <div key={index} className="relative w-[25%] aspect-square">
-                <img
-                  src={url}
-                  alt={`existing-image-${index}`}
-                  className="w-full h-full object-cover rounded-xl"
-                />
-                <X
-                  onClick={() => removeExistingImage(index)}
-                  className="cursor-pointer text-black absolute top-2 right-2 rounded-full w-5 h-5 p-1 border bg-white"
-                />
+        <Label name='Images' />
+        {color.map((color, i) => (
+          <div key={i} className="grid md:grid-cols-2 gap-2 my-2 items-center">
+            <div>
+              <p className='inline-block'>{color}</p>
+              <PlusBtn onClick={() => fileInputRefs.current[i]!.click()} />
+            </div>
+
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(e) => addImage(e, i)}
+              className="hidden"
+              ref={el => { fileInputRefs.current[i] = el }}
+            />
+
+            <div className="grid grid-cols-4 gap-2 mb-2">
+              {existingImages.length > 0 && (
+                existingImages[i].map((url, index) => (
+                  <div key={index} className="relative aspect-square">
+                    <img
+                      src={url}
+                      alt={`image-${index}`}
+                      className="w-full h-full object-cover rounded-xl"
+                    />
+                    <X
+                      onClick={() => removeExistingImage(i, index)}
+                      className="cursor-pointer text-gray-700 absolute top-2 right-2 rounded-full w-5 h-5 p-1 border bg-white"
+                    />
+                  </div>
+                ))
+              )}
+
+              {images[i]?.length > 0 && (
+                images[i].map((file, index) => (
+                  <div key={index} className="relative block aspect-square ">
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt={`attachment-${index}`}
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                    <X
+                      onClick={() => removeImage(i, index)}
+                      className="cursor-pointer text-gray-700 absolute top-2 right-2 rounded-full w-5 h-5 p-1 border bg-white"
+                    />
+                  </div>
+                ))
+              )}
+
+              <div className="mb-2 rounded-lg aspect-square bg-white grid place-items-center cursor-pointer hover:opacity-50 duration-500" onClick={() => { fileInputRefs.current[i]!.click() }}>
+                <ImagePlus className='text-gray-400' />
               </div>
-            ))}
+            </div>
           </div>
-        )}
+        ))}
 
         <button type="submit">
           {location.pathname.includes('new') ? 'Add Product' : 'Update Product'}
         </button>
 
         {!location.pathname.includes('new') &&
-          <button type="button" className='float-right' onClick={deleteProduct}>
+          <button type="button" className='float-right' onClick={deleteAction}>
             delete
           </button>
         }
