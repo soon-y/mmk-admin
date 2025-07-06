@@ -257,7 +257,9 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
                       <p className='text-sm'>{colorHex[index]}</p>
                     </div>
                   </div>
+                  <div className='flex justify-end'>
                   <Palette index={index} setColorHex={setColorHex} initial={colorHex[index]} />
+                  </div>
                 </div>
               ))}
             </div>

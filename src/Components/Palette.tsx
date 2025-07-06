@@ -1,18 +1,17 @@
-import { useEffect } from "react"
-import { ColorPicker, useColor } from "react-color-palette"
-import "react-color-palette/css"
+import { useEffect, useState } from "react"
+import { Colorful } from '@uiw/react-color'
 
 export function Palette({ index, initial, setColorHex }: { index: number, initial: string, setColorHex: React.Dispatch<React.SetStateAction<string[]>> }) {
-  const [color, setColor] = useColor(initial)
+  const [color, setColor] = useState(initial)
 
-  useEffect(() => {
+   useEffect(() => {
     setColorHex(prev =>
-      prev.map((item, i) => i === index ? color.hex : item)
+      prev.map((item, i) => i === index ? color : item)
     )
-  }, [color.hex, index])
+  }, [color])
 
   return (
-    <>
-      <ColorPicker height={40} hideInput={["rgb", "hsv", 'hex']} color={color} onChange={setColor} />
-    </>)
+    <Colorful color={color} onChange={(color) => { setColor(color.hex) }}
+    />
+  );
 }
