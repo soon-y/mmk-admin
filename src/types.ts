@@ -2,13 +2,28 @@ export type ProductProps = {
   id: number
   name: string
   category: number
-  stock: number
   price: number
-  mainImg: string
+  stock: string
   images: string[]
   description: string
+  material: string
   size: string
   color: string
+  colorHex: string
+  imagesCount: string
+  measurement: string
+}
+
+export type ProductDisplayProps = {
+  id: number
+  name: string
+  category: number
+  price: number
+  stock: string
+  images: string[]
+  size: string
+  color: string
+  colorHex: string
 }
 
 export type CategoryProps = {
@@ -17,12 +32,14 @@ export type CategoryProps = {
   order: number
   optGroup: boolean
   groupID: number | null
+  image: string | File | null
 }
 
 export type GroupedCategory = {
   id: number
   name: string
   order: number
+  image: string | File | null
   children: CategoryProps[]
 }
 
