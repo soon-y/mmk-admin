@@ -1,26 +1,29 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import type { GroupedCategory, ProductProps, CategoryProps } from "../types"
-import { Trash2, Plus, ChevronDown, ChevronUp, ListTree } from "lucide-react"
-import CategoryName from "./CategoryName"
-import { sortData, fetchCategory } from "../utils/categoryUtils"
+import { Trash2, Plus, ChevronDown, ChevronUp, ListTree, ImagePlus } from "lucide-react"
+import CategoryName from "./ui/CategoryName"
+import { sortData, fetchCategory, updateCategory } from "../utils/categoryUtils"
 import { fetchProducts } from "../utils/productUtils"
 import LoadingBar from "./LoadingBar"
-import axios from 'axios'
+import { X } from "lucide-react"
 
 export default function Category() {
   const [categories, setCategories] = useState<GroupedCategory[]>([])
   const [products, setProducts] = useState<ProductProps[]>([])
   const [arrayInit, setArrayInit] = useState<CategoryProps[]>([])
-  const [array, setArray] = useState<CategoryProps[]>([])
+  const [categoryArray, setCategoryArray] = useState<CategoryProps[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [updating, setUpdating] = useState<boolean>(false)
   const [changeDetected, setChangeDetected] = useState<boolean>(false)
+  const fileInputRefs = useRef<(HTMLInputElement | null)[]>([])
+  const btnStyleGroup = 'cursor-pointer inline mx-1 p-1 border-2 rounded-full w-7 h-7'
+  const btnStyleChild = 'cursor-pointer inline mx-1 p-1 border rounded-full'
 
   useEffect(() => {
     Promise.all([fetchCategory(), fetchProducts()])
       .then(([categoryData, productData]) => {
         setCategories(sortData(categoryData))
-        setArray(categoryData)
+        setCategoryArray(categoryData)
         setArrayInit(categoryData)
         setProducts(productData)
         setLoading(false)
@@ -28,25 +31,31 @@ export default function Category() {
       .catch((err) => {
         console.error('Failed to fetch data:', err)
       })
-  }, [updating])
+  }, [])
 
   useEffect(() => {
-    if (array.length !== arrayInit.length) {
+    setCategories(sortData(categoryArray))
+
+    if (categoryArray.length !== arrayInit.length) {
       setChangeDetected(true)
       return
     }
 
-    for (let i = 0; i < array.length; i++) {
-      if (array[i].name !== arrayInit[i].name) {
+    for (let i = 0; i < categoryArray.length; i++) {
+      if (categoryArray[i].image !== arrayInit[i].image ||
+        categoryArray[i].name !== arrayInit[i].name ||
+        categoryArray[i].order !== arrayInit[i].order) {
         setChangeDetected(true)
         return
+      } else {
+        setChangeDetected(false)
       }
     }
 
-  }, [array])
+  }, [categoryArray])
 
   const updateArrayOrder = (id: number, newVal: number) => {
-    setArray(prev =>
+    setCategoryArray(prev =>
       prev.map(item => {
         if (item.id === id) { return { ...item, order: newVal } } else { return item }
       })
@@ -55,22 +64,24 @@ export default function Category() {
 
   const addcategory = () => {
     const newCategory = {
-      id: array.length + 1,
+      id: categoryArray.length + 1,
       name: 'New Category',
       order: categories.length,
+      image: null,
       children: []
     }
 
     const newItem = {
-      id: array.length + 1,
+      id: categoryArray.length + 1,
       name: 'New Category',
       order: categories.length,
       optGroup: true,
       groupID: null,
+      image: null
     }
 
     setCategories(prev => [...prev, newCategory])
-    setArray(prev => [...prev, newItem])
+    setCategoryArray(prev => [...prev, newItem])
   }
 
   const addSubcategory = (groupId: number) => {
@@ -82,11 +93,12 @@ export default function Category() {
             children: [
               ...group.children,
               {
-                id: array.length + 1,
+                id: categoryArray.length + 1,
                 name: 'New Subcategory',
                 order: group.children.length,
                 optGroup: false,
                 groupID: groupId,
+                image: null,
               },
             ],
           }
@@ -98,20 +110,21 @@ export default function Category() {
     const count = group ? group.children.length : 0
 
     const newItem = {
-      id: array.length + 1,
+      id: categoryArray.length + 1,
       name: 'New Subcategory',
       order: count,
       optGroup: false,
       groupID: groupId,
+      image: null,
     }
 
-    setArray(prev => [...prev, newItem])
+    setCategoryArray(prev => [...prev, newItem])
   }
 
   const deleteCategory = (groupId: number) => {
     setCategories(prev => prev.filter(group => group.id !== groupId))
-    setArray(prev => prev.filter(item => item.id !== groupId))
-    setArray(prev => prev.filter(el => el.groupID !== groupId))
+    setCategoryArray(prev => prev.filter(item => item.id !== groupId))
+    setCategoryArray(prev => prev.filter(el => el.groupID !== groupId))
   }
 
   const deleteSubcategory = (groupId: number, subId: number) => {
@@ -125,7 +138,7 @@ export default function Category() {
           : group
       )
     )
-    setArray(prev => prev.filter(item => item.id !== subId))
+    setCategoryArray(prev => prev.filter(item => item.id !== subId))
   }
 
   const moveGroup = (groupId: number, direction: 'up' | 'down') => {
@@ -174,23 +187,47 @@ export default function Category() {
     )
   }
 
-  const updateCategory = async () => {
+  const update = async () => {
     setUpdating(true)
-    try {
-      const res = await axios.post('https://mmk-backend.onrender.com/category/replace', array, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      
-      if (res.data) {
-        setUpdating(false)
+
+    const formData = new FormData()
+
+    const categoryForm = categoryArray.map(cat => {
+      if (cat.image instanceof File) {
+        formData.append(`image-${cat.id}`, cat.image)
+        return { ...cat, image: null }
       }
-    } catch (err: unknown) {
-      const error = err as any
-      console.error(error.response?.data || error.message || error)
+      return cat;
+    });
+
+    formData.append('categories', JSON.stringify(categoryForm))
+    const res = await updateCategory(formData)
+
+    if (res) {
       setUpdating(false)
+      setChangeDetected(false)
     }
+  }
+
+  const addImage = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const file = e.target.files?.[0]
+
+    if (!file) return
+
+    setCategoryArray(prev =>
+      prev.map((el) =>
+        el.id === index ? { ...el, image: file } : el
+      )
+    )
+    e.target.value = ''
+  }
+
+  const removeImage = (index: number) => {
+    setCategoryArray(prev =>
+      prev.map((el) =>
+        el.id === index ? { ...el, image: null } : el
+      )
+    )
   }
 
   return (
@@ -200,37 +237,90 @@ export default function Category() {
           <ListTree className="inline mr-2 w-5" />
           <span className="font-bold">Category</span>
         </div>
-        <button disabled={!changeDetected} onClick={updateCategory}>SAVE</button>
+        <button disabled={!changeDetected} onClick={update}>SAVE</button>
       </div>
 
       <div className="mt-4">
         {categories.map((group) => (
           <div key={group.id} className="mb-6">
-            <div className="flex justify-between gap-2 border border-gray-400 w-full p-4 rounded-full shadow-md">
-              <strong className="inline"><CategoryName name={group.name} id={group.id} setArray={setArray} /></strong>
+            <div className="flex justify-between items-center gap-2 border-b border-gray-400 w-full mx-1 py-2">
+              <strong className="inline"><CategoryName name={group.name} id={group.id} setArray={setCategoryArray} /></strong>
               <div className="flex items-center">
                 {products.filter(p => group.children.some(child => child.id === p.category)).length === 0 ?
                   <Trash2 onClick={() => deleteCategory(group.id)} className="cursor-pointer inline mx-1 p-1 border-2 rounded-full w-7 h-7 border-red-300 text-red-500" /> :
-                  <span className="mx-2">{products.filter(p => group.children.some(child => child.id === p.category)).length}</span>
+                  <span className="mx-3">{products.filter(p => group.children.some(child => child.id === p.category)).length}</span>
                 }
-                <ChevronUp onClick={() => moveGroup(group.id, 'up')} className="cursor-pointer inline mx-1 p-1 border-2 rounded-full w-7 h-7" />
-                <ChevronDown onClick={() => moveGroup(group.id, 'down')} className="cursor-pointer inline mx-1 p-1 border-2 rounded-full w-7 h-7" />
-                <Plus onClick={() => addSubcategory(group.id)} className="cursor-pointer inline mx-1 p-1 border-2 rounded-full w-7 h-7" />
+                <ChevronUp onClick={() => moveGroup(group.id, 'up')} className={btnStyleGroup} />
+                <ChevronDown onClick={() => moveGroup(group.id, 'down')} className={btnStyleGroup} />
+                <Plus onClick={() => addSubcategory(group.id)} className={btnStyleGroup} />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => addImage(e, group.id)}
+                  className="hidden"
+                  ref={el => { fileInputRefs.current[group.id] = el }}
+                />
+                <div>
+                  {group.image === null ?
+                    <div>
+                      <ImagePlus className={btnStyleGroup} onClick={() => { fileInputRefs.current[group.id]!.click() }}></ImagePlus>
+                    </div>
+                    :
+                    <div className="ml-2 relative">
+                      <img onClick={() => { fileInputRefs.current[group.id]!.click() }}
+                        src={typeof group.image === 'string' ? group.image : URL.createObjectURL(group.image)}
+                        alt={`attachment-${group.id}`}
+                        className="h-20"
+                      />
+                      <X
+                        onClick={() => removeImage(group.id)} strokeWidth={3}
+                        className="cursor-pointer text-gray-700 absolute top-2 right-2 rounded-full w-5 h-5 p-1 border bg-white"
+                      />
+                    </div>
+                  }
+                </div>
               </div>
             </div>
-            <ul className="ml-4">
+            <ul>
               {group.children.map((sub) => (
                 <div key={sub.id}>
-                  <div className="ml-8 w-1 h-3 bg-gray-300"></div>
-                  <li className="items-center gap-2 border border-gray-400 w-94 ml-2 px-4 py-3 rounded-full flex justify-between shadow-md">
-                    <CategoryName name={sub.name} id={sub.id} setArray={setArray} />
+                  <li className="items-center gap-2 border-b border-gray-400 py-2 flex justify-between">
+                    <div className="flex">
+                      <span className="mr-2 text-gray-400">└─</span><CategoryName name={sub.name} id={sub.id} setArray={setCategoryArray} />
+                    </div>
                     <div className="flex items-center">
                       {products.filter(p => p.category === sub.id).length === 0 ?
-                        <Trash2 onClick={() => deleteSubcategory(group.id, sub.id)} className="cursor-pointer inline mx-1 p-1 border rounded-full border-red-300 text-red-500" /> :
-                        <span className="mx-2">{products.filter(p => p.category === sub.id).length}</span>
+                        <Trash2 onClick={() => deleteSubcategory(group.id, sub.id)} className={`${btnStyleChild} border-red-300 text-red-500`} /> :
+                        <span className="mx-3">{products.filter(p => p.category === sub.id).length}</span>
                       }
-                      <ChevronUp onClick={() => moveSubcategory(group.id, sub.id, 'up')} className="cursor-pointer inline mx-1 p-1 border rounded-full" />
-                      <ChevronDown onClick={() => moveSubcategory(group.id, sub.id, 'down')} className="cursor-pointer inline mx-1 p-1 border rounded-full" />
+                      <ChevronUp onClick={() => moveSubcategory(group.id, sub.id, 'up')} className={btnStyleChild} />
+                      <ChevronDown onClick={() => moveSubcategory(group.id, sub.id, 'down')} className={btnStyleChild} />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => addImage(e, sub.id)}
+                        className="hidden"
+                        ref={el => { fileInputRefs.current[sub.id] = el }}
+                      />
+                      <div>
+                        {sub.image === null ?
+                          <div>
+                            <ImagePlus className={btnStyleChild} onClick={() => { fileInputRefs.current[sub.id]!.click() }} />
+                          </div>
+                          :
+                          <div className="ml-2 relative" onClick={() => { fileInputRefs.current[sub.id]!.click() }}>
+                            <img onClick={() => { fileInputRefs.current[sub.id]!.click() }}
+                              src={typeof sub.image === 'string' ? sub.image : URL.createObjectURL(sub.image)}
+                              alt={`attachment-${sub.id}`}
+                              className="h-20"
+                            />
+                            <X
+                              onClick={() => removeImage(sub.id)} strokeWidth={3}
+                              className="cursor-pointer text-gray-700 absolute top-2 right-2 rounded-full w-5 h-5 p-1 border bg-white"
+                            />
+                          </div>
+                        }
+                      </div>
                     </div>
                   </li>
                 </div>
@@ -240,10 +330,37 @@ export default function Category() {
         ))}
 
         {loading ?
-          Array.from({ length: 10 }).map((_, i) => (
-            <div key={i} className='animate-pulse border border-gray-300 h-14 mb-4 w-full p-4 rounded-full shadow-xl'></div>
+          Array.from({ length: 2 }).map((_, i) => (
+            <div key={i} className='animate-pulse mb-4 text-gray-400'>
+              <div className="flex justify-between border-b py-3 border-gray-200">
+                <div className="flex gap-2 items-center">
+                  <div className="bg-gray-100 w-5 h-5 mx-1 rounded-md"></div>
+                  <div className="bg-gray-100 w-20 h-5 rounded-md"></div>
+                </div>
+                <div className='flex gap-2 items-center'>
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className="w-7 rounded-full aspect-square bg-gray-100"></div>
+                  ))}
+                </div>
+              </div>
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="flex justify-between border-b py-2 border-gray-300">
+                  <div className="flex gap-2 items-center">
+                    <span className="mr-2">└─</span>
+                    <div className="bg-gray-100 w-5 h-5 mx-1 rounded-md"></div>
+                    <div className="bg-gray-100 w-20 h-5 rounded-md"></div>
+                  </div>
+                  <div className='flex gap-2 items-center'>
+                    {Array.from({ length: 4 }).map((_, i) => (
+                      <div key={i} className="w-6 rounded-full aspect-square bg-gray-100"></div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+
+            </div>
           )) :
-          <div className="cursor-pointer flex gap-2 bg-yellow-300 w-full p-4 mb-4 rounded-full shadow-xl" onClick={addcategory}>
+          <div className="cursor-pointer flex gap-2 items-center bg-yellow-300 rounded-md p-4" onClick={addcategory}>
             <Plus className="w-5" /> <p className="inline text-black font-medium">add new Category Group</p>
           </div>
         }
