@@ -1,0 +1,7 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+	<title>loadingBar</title>
+	<style>
+		.s0 { fill: none;stroke: #000000;stroke-miterlimit:100;stroke-width: 19 } 
+	</style>
+	<path id="모양 2" class="s0" d="m54 111h291c2.8 0 5 2.2 5 5v166c0 2.8-2.2 5-5 5h-291c-2.8 0-5-2.2-5-5v-166c0-2.8 2.2-5 5-5zm4 10l284 158"/>
+</svg>
