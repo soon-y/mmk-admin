@@ -11,7 +11,7 @@ export function Palette({ index, initial, setColorHex }: { index: number, initia
   }, [color])
 
   return (
-    <Colorful color={color} onChange={(color) => { setColor(color.hex) }}
+    <Colorful style={{ width:'100%' }} color={color} onChange={(color) => { setColor(color.hex) }}
     />
   );
 }
