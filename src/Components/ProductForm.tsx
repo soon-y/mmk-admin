@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useLocation } from 'react-router-dom'
-import { X, ImagePlus } from "lucide-react"
+import { X, ImagePlus, MinusCircle } from "lucide-react"
 import LoadingBar from './LoadingBar'
 import type { ProductProps, CategoryProps } from '../types'
 import { fetchCategory } from '../utils/categoryUtils'
@@ -22,7 +22,7 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
   const [name, setName] = useState<string>(product === '' ? '' : product.name)
   const [price, setPrice] = useState<string>(product === '' ? '' : product.price.toString())
   const [size, setSize] = useState<string[]>(product === '' ? ['one size'] : product.size.split('/'))
-  const [color, setColor] = useState<string[]>(product === '' ? ['one color'] : product.color.split('/'))
+  const [color, setColor] = useState<string[]>(product === '' ? ['White'] : product.color.split('/'))
   const [stock, setStock] = useState<number[][]>(product === '' ? [[0]] : product.stock.split('/').map(row => row.split(',').map(Number)))
   const [colorHex, setColorHex] = useState<string[]>(product === '' ? ['#ffffff'] : product.colorHex.split('/'))
   const [description, setDescription] = useState<string>(product === '' ? '' : product.description)
@@ -202,6 +202,8 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
     if (deletedColorIndex !== null) {
       setStock(stock.map(row => row.filter((_, j) => j !== deletedColorIndex)))
       setImages(images.map(row => row.filter((_, j) => j !== deletedColorIndex)))
+      setColor(prev => prev.filter((_, index) => index !== deletedColorIndex))
+      setColorHex(prev => prev.filter((_, index) => index !== deletedColorIndex))
     }
   }, [deletedColorIndex])
 
@@ -220,14 +222,14 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
           </div>
 
           <div>
-            <Label name='Price' />
-            <Input label='Price (€)' type='number' value={price} setValue={setPrice} />
+            <Label name='Price (€)' />
+            <Input label='Price' type='number' value={price} setValue={setPrice} />
           </div>
 
           <div>
             <Label name='Size' />
             <PlusBtn onClick={() => {
-              setSize(prev => [...prev, 'one size ' + prev.length])
+              setSize(prev => [...prev, 'size ' + prev.length])
               setStock(prev => [...prev, new Array(color.length).fill(0)])
             }} />
             <div className='bg-white px-4 py-2 rounded-xl my-2'>
@@ -240,25 +242,22 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
           <div>
             <Label name='Color' />
             <PlusBtn onClick={() => {
-              setColor(prev => [...prev, 'one color ' + prev.length])
+              setColor(prev => [...prev, 'White'])
               setColorHex(prev => [...prev, '#ffffff'])
               setStock(prev => prev.map(row => [...row, 0]))
               setImages(prev => [...prev, []])
               setImagesCount(prev => [...prev, '0'])
             }} />
 
-            <div className='bg-white px-4 py-2 rounded-xl my-2 grid gap-2'>
+            <div className='bg-white px-4 py-3 rounded-xl my-2 grid gap-2'>
               {color.map((item, index) => (
-                <div key={index} className='grid md:grid-cols-2 gap-2 items-center'>
-                  <div>
-                    <EditableName name={item} id={index} arrayLength={color.length} setArray={setColor} key={index} setDeletedIndex={setDeletedColorIndex} />
-                    <div className='flex gap-2 items-center mt-1'>
-                      <div className='w-4 aspect-square rounded-full border border-gray-400' style={{ backgroundColor: colorHex[index] }}></div>
-                      <p className='text-sm'>{colorHex[index]}</p>
-                    </div>
+                <div key={index} className='grid md:grid-cols-2 gap-1 items-center'>
+                  <div className='flex gap-1'>
+                    <p>{item}</p>
+                    {color.length > 1 && <MinusCircle className='pointer-cursor w-5 text-red-500' strokeWidth={1} onClick={() => setDeletedColorIndex(index)} />}
                   </div>
-                  <div className='flex justify-end'>
-                  <Palette index={index} setColorHex={setColorHex} initial={colorHex[index]} />
+                  <div className='flex'>
+                    <Palette index={index} setColorArray={setColor} setColorHex={setColorHex} initial={colorHex[index]}/>
                   </div>
                 </div>
               ))}
