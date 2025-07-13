@@ -302,25 +302,6 @@ export default function Category() {
                         className="hidden"
                         ref={el => { fileInputRefs.current[sub.id] = el }}
                       />
-                      <div>
-                        {sub.image === null ?
-                          <div>
-                            <ImagePlus className={btnStyleChild} onClick={() => { fileInputRefs.current[sub.id]!.click() }} />
-                          </div>
-                          :
-                          <div className="ml-2 relative" onClick={() => { fileInputRefs.current[sub.id]!.click() }}>
-                            <img onClick={() => { fileInputRefs.current[sub.id]!.click() }}
-                              src={typeof sub.image === 'string' ? sub.image : URL.createObjectURL(sub.image)}
-                              alt={`attachment-${sub.id}`}
-                              className="h-20"
-                            />
-                            <X
-                              onClick={() => removeImage(sub.id)} strokeWidth={3}
-                              className="cursor-pointer text-gray-700 absolute top-2 right-2 rounded-full w-5 h-5 p-1 border bg-white"
-                            />
-                          </div>
-                        }
-                      </div>
                     </div>
                   </li>
                 </div>
@@ -351,7 +332,7 @@ export default function Category() {
                     <div className="bg-gray-100 w-20 h-5 rounded-md"></div>
                   </div>
                   <div className='flex gap-2 items-center'>
-                    {Array.from({ length: 4 }).map((_, i) => (
+                    {Array.from({ length: 3 }).map((_, i) => (
                       <div key={i} className="w-6 rounded-full aspect-square bg-gray-100"></div>
                     ))}
                   </div>
@@ -360,7 +341,7 @@ export default function Category() {
 
             </div>
           )) :
-          <div className="cursor-pointer flex gap-2 items-center bg-yellow-300 rounded-md p-4" onClick={addcategory}>
+          <div className="cursor-pointer flex gap-2 items-center bg-yellow-300 rounded-md p-2" onClick={addcategory}>
             <Plus className="w-5" /> <p className="inline text-black font-medium">add new Category Group</p>
           </div>
         }
