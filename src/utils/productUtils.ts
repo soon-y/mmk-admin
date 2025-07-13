@@ -38,7 +38,7 @@ export const postProducts = async (formData: FormData) => {
 
 export const updateProduct = async (id: number, formData: FormData) => {
   try {
-    const res = await axios.patch(`https://mmk-backend.onrender.com/${id}`, formData, {
+    const res = await axios.patch(`https://mmk-backend.onrender.com/products/${id}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
