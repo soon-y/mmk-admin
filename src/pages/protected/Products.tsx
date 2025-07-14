@@ -19,7 +19,7 @@ function Products() {
   const [sizeFilterData, setSizeFilterData] = useState<string[]>([])
   const [colorFilterData, setColorFilterData] = useState<string[]>([])
   const [category, setCategory] = useState<CategoryProps[]>([])
-  const style = 'grid grid-cols-[70px_100px_150px_80px_90px_120px_80px_120px] lg:grid-cols-[70px_100px_1fr_80px_90px_120px_80px_120px] gap-2 items-center'
+  const style = 'grid grid-cols-[70px_100px_150px_80px_90px_120px_80px_120px] xl:grid-cols-[70px_100px_1fr_80px_90px_120px_80px_120px] gap-2 items-center'
 
   useEffect(() => {
     Promise.all([fetchCategory(), fetchProducts()])
@@ -112,7 +112,7 @@ function Products() {
 
   return (
     <div className="container-overflow-x">
-      <div className="p-8 w-max">
+      <div className="p-8 w-max xl:w-full">
         <div className={`${style} h-12 bg-white rounded-xl font-bold text-sm mb-2`}>
           <div className='cursor-pointer h-5 flex itmes-center ml-4' onClick={() => toggleSort('id')}>ID <SortArrow field="id" /> </div>
           <CategorySelection disabled={false} option='Category' categoryIndex={categoryFilter} noPadding={true} setValue={setCategoryFilter} setLoading={setLoading} />
