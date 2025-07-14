@@ -6,6 +6,7 @@ import { sortData, fetchCategory, updateCategory } from "../utils/categoryUtils"
 import { fetchProducts } from "../utils/productUtils"
 import LoadingBar from "./LoadingBar"
 import { X } from "lucide-react"
+import BtnForAdmin from "./ui/btnForAdmin"
 
 export default function Category() {
   const [categories, setCategories] = useState<GroupedCategory[]>([])
@@ -237,7 +238,7 @@ export default function Category() {
           <ListTree className="inline mr-2 w-5" />
           <span className="font-bold">Category</span>
         </div>
-        <button disabled={!changeDetected} onClick={update}>SAVE</button>
+        <BtnForAdmin disabled={!changeDetected} onClick={update}>SAVE</BtnForAdmin>
       </div>
 
       <div className="mt-4">

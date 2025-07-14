@@ -7,6 +7,7 @@ import { fetchBanner, sortBanner, updateBanner } from "../utils/bannerUtils"
 import Label from "./ui/label"
 import Input from "./ui/input"
 import BannerLinkSelection from "./ui/bannerLinkSelection"
+import BtnForAdmin from "./ui/btnForAdmin"
 
 export default function Banner() {
   const [banners, setBanners] = useState<BannerProps[]>([])
@@ -100,7 +101,7 @@ export default function Banner() {
           <Image className="inline mr-2 w-5" />
           <span className="font-bold">Banner</span>
         </div>
-        <button disabled={!changeDetected} onClick={update}>SAVE</button>
+        <BtnForAdmin disabled={!changeDetected} onClick={update}>save</BtnForAdmin>
       </div>
 
       {banners.length === 1 &&
@@ -231,7 +232,7 @@ const BannerComp = ({ banners, index, setBanners }: {
 
   return (
     <div>
-      <div className="flex justify-end mt-8">
+      <div className="flex justify-end mt-8 mb-2 md:mb-2">
         <ChevronUp onClick={() => moveGroup('up')} className={btnStyleGroup} />
         <ChevronDown onClick={() => moveGroup('down')} className={btnStyleGroup} />
         <Trash2 onClick={() => deleteBanner()} className="cursor-pointer inline mx-1 p-1 border-2 rounded-full w-7 h-7 border-red-300 text-red-500" />

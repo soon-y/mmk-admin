@@ -13,6 +13,8 @@ import TextArea from './ui/textArea'
 import CategorySelection from './ui/categorySelection'
 import Label from './ui/label'
 import PlusBtn from './ui/plusBtn'
+import { useAuth } from '../context/auth'
+import BtnForAdmin from './ui/btnForAdmin'
 
 function ProductForm({ product }: { product: ProductProps | '' }) {
   const location = useLocation()
@@ -36,6 +38,7 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
   const [deletedColorIndex, setDeletedColorIndex] = useState<number | null>(null)
   const [deletedSizeIndex, setDeletedSizeIndex] = useState<number | null>(null)
   const [category, setCategory] = useState<CategoryProps[]>([])
+  const { user } = useAuth()
 
   useEffect(() => {
     fetchCategory().then((data) => {
@@ -98,6 +101,11 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!user?.admin) {
+      alert("You are not authorized to perform this action.")
+      return
+    }
 
     const formData = new FormData()
     formData.append('name', name)
@@ -165,6 +173,8 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
 
       const res = await updateProduct(product.id, formData)
       if (res) {
+        console.log('clicked')
+
         setLoading(false)
         navigate('/products')
       } else {
@@ -174,6 +184,10 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
   }
 
   const deleteAction = async () => {
+
+    const confirmed = window.confirm("Are you sure you want to delete this item?");
+    if (!confirmed) return;
+
     if (product) {
       const res = await deleteProduct(product.id)
 
@@ -257,7 +271,7 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
                     {color.length > 1 && <MinusCircle className='pointer-cursor w-5 text-red-500' strokeWidth={1} onClick={() => setDeletedColorIndex(index)} />}
                   </div>
                   <div className='flex'>
-                    <Palette index={index} setColorArray={setColor} setColorHex={setColorHex} initial={colorHex[index]}/>
+                    <Palette index={index} setColorArray={setColor} setColorHex={setColorHex} initial={colorHex[index]} />
                   </div>
                 </div>
               ))}
@@ -344,15 +358,15 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
           </div>
         ))}
 
-        <button type="submit">
-          {location.pathname.includes('new') ? 'Add Product' : 'Update Product'}
-        </button>
-
-        {!location.pathname.includes('new') &&
-          <button type="button" className='float-right' onClick={deleteAction}>
-            delete
+        <div className='flex flex-col md:flex-row md:justify-between gap-4'>
+          <button type="submit" className='uppercase md:shrink-0'>
+            {location.pathname.includes('new') ? 'Add Product' : 'Update Product'}
           </button>
-        }
+
+          {!location.pathname.includes('new') &&
+            <BtnForAdmin onClick={deleteAction} classname='w-full md:w-auto md:shrink-0'>delete</BtnForAdmin>
+          }
+        </div>
       </form>
 
       {loading && <LoadingBar />}
