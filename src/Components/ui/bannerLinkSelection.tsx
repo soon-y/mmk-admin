@@ -9,7 +9,7 @@ export default function BannerLinkSelection(
   }: {
     value: string
     option: string
-    setValue: React.Dispatch<React.SetStateAction<string>>
+    setValue: (value: string) => void
   }) {
 
   const [selection, setSelection] = useState<string[]>([])
