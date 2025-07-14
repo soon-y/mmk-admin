@@ -52,3 +52,13 @@ export type UserProps = {
   password: string
   admin: boolean
 }
+
+export type BannerProps = {
+  id: number
+  title: string
+  text: string
+  image: string | File | null
+  order: number
+  buttonName: string
+  buttonLink: string
+}

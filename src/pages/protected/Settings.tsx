@@ -3,6 +3,7 @@ import Category from "../../Components/Category"
 import { Users } from "lucide-react"
 import type { UserProps } from "../../types"
 import { fetchMembers } from "../../utils/profileUtils"
+import Banner from "../../Components/Banner"
 
 function Settings() {
   const [members, setMembers] = useState<UserProps[]>([])
@@ -42,6 +43,10 @@ function Settings() {
             ))
           }
         </div>
+      </div>
+
+      <div className={styles}>
+        <Banner />
       </div>
 
       <div className={styles}>
