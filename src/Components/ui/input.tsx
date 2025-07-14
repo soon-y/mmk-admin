@@ -1,14 +1,15 @@
 export default function Input(
   {
-    label, type, value, setValue
+    label, type, value, setValue, classname
   }: {
     label: string,
     type: string
     value: string | number,
+    classname?: string 
     setValue: React.Dispatch<React.SetStateAction<string>>
   }) {
   return (
-    <div>
+    <div className={`rounded-xl ${classname}`}>
       <input
         id={label}
         className="w-full rounded-xl bg-white px-4 py-2"
