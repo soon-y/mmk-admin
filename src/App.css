@@ -6,8 +6,20 @@
   background-color: rgb(240, 240, 240);
 }
 
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 .container {
   margin-left: 200px;
   max-width: calc(100vw - 200px);
   min-height: 100vh;
+}
+
+.container-overflow-x {
+  margin-left: 200px;
+  width: calc(100vw - 200px);
+  min-height: 100vh;
+  overflow-x: auto;
+  box-sizing: border-box;
 }
