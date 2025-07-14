@@ -242,7 +242,7 @@ export default function Category() {
 
       <div className="mt-4">
         {categories.map((group) => (
-          <div key={group.id} className="mb-6">
+          <div key={group.id} className="mb-2">
             <div className="flex justify-between items-center gap-2 border-b border-gray-400 w-full mx-1 py-2">
               <strong className="inline"><CategoryName name={group.name} id={group.id} setArray={setCategoryArray} /></strong>
               <div className="flex items-center">
@@ -341,7 +341,7 @@ export default function Category() {
 
             </div>
           )) :
-          <div className="cursor-pointer flex gap-2 items-center bg-yellow-300 rounded-md p-2" onClick={addcategory}>
+          <div className="mt-6 cursor-pointer flex gap-2 items-center bg-yellow-300 rounded-md p-2" onClick={addcategory}>
             <Plus className="w-5" /> <p className="inline text-black font-medium">add new Category Group</p>
           </div>
         }
