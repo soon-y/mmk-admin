@@ -5,7 +5,6 @@ import LoadingBar from "./LoadingBar"
 import { X } from "lucide-react"
 import { fetchBanner, sortBanner, updateBanner } from "../utils/bannerUtils"
 import Label from "./ui/label"
-import Input from "./ui/input"
 import BannerLinkSelection from "./ui/bannerLinkSelection"
 import BtnForAdmin from "./ui/btnForAdmin"
 
@@ -86,8 +85,8 @@ export default function Banner() {
     })
 
     formData.append('banners', JSON.stringify(form))
-    const res = await updateBanner(formData)
 
+    const res = await updateBanner(formData)
     if (res) {
       setUpdating(false)
       setChangeDetected(false)
@@ -116,8 +115,33 @@ export default function Banner() {
 
       {loading ?
         Array.from({ length: 2 }).map((_, i) => (
-          <div key={i} className='animate-pulse mb-4 text-gray-400'>
+          <div className="animate-pulse" key={i}>
+            <div className="flex justify-end mt-8 mb-2 md:mb-2 gap-2">
+              {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="w-7 rounded-full aspect-square bg-gray-100"></div>
+              ))}
+            </div>
+            <div className="grid grid-rows md:grid-cols-2 gap-4">
+              <div className="cursor-pointer w-full h-42 rounded-md md:h-full bg-gray-100 grid place-items-center">
+                <ImagePlus className="text-gray-400"></ImagePlus>
+              </div>
 
+              <div className="flex flex-col gap-1">
+                <div>
+                  <Label name="Title" />
+                  <div className="w-full h-10 rounded-md bg-gray-100"></div>
+
+                </div>
+                <div>
+                  <Label name="Description" />
+                  <div className="w-full h-10 rounded-md bg-gray-100"></div>
+                </div>
+                <div>
+                  <Label name="Button name" />
+                  <div className="w-full h-10 rounded-md bg-gray-100"></div>
+                </div>
+              </div>
+            </div>
           </div>
         )) :
         <div className="mt-4 cursor-pointer flex gap-2 items-center bg-yellow-300 rounded-md p-2" onClick={addNewBanner}>
@@ -126,7 +150,7 @@ export default function Banner() {
       }
 
       {updating && <LoadingBar />}
-      
+
     </div>
   )
 }
@@ -138,51 +162,8 @@ const BannerComp = ({ banners, index, setBanners }: {
 }) => {
   const btnStyleGroup = 'cursor-pointer inline mx-1 p-1 border-2 rounded-full w-7 h-7'
   const item = banners[index]
-  const [title, setTitle] = useState<string>(item.title)
-  const [text, setText] = useState<string>(item.text)
-  const [buttonName, setButtonName] = useState<string>(item.buttonName)
-  const [buttonLink, setButtonLink] = useState<string>(item.buttonLink)
   const fileInputRef = useRef<(HTMLInputElement | null)>(null)
   const i = item.id
-
-  useEffect(() => {
-    setBanners(prev =>
-      prev.map((el) =>
-        el.id === i ? { ...el, title } : el
-      )
-    )
-  }, [title])
-
-  useEffect(() => {
-    setBanners(prev =>
-      prev.map((el) =>
-        el.id === i ? { ...el, text } : el
-      )
-    )
-  }, [text])
-
-  useEffect(() => {
-    setBanners(prev =>
-      prev.map((el) =>
-        el.id === i ? { ...el, buttonName } : el
-      )
-    )
-  }, [buttonName])
-
-  useEffect(() => {
-    setBanners(prev =>
-      prev.map((el) =>
-        el.id === i ? { ...el, buttonLink } : el
-      )
-    )
-  }, [buttonLink])
-
-  useEffect(() => {
-    setTitle(item.title)
-    setText(item.text)
-    setButtonName(item.buttonName)
-    setButtonLink(item.buttonLink)
-  }, [item])
 
   const addImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -269,20 +250,62 @@ const BannerComp = ({ banners, index, setBanners }: {
         <div className="flex flex-col gap-1">
           <div>
             <Label name="Title" />
-            <Input classname="border border-gray-400" label='Title' type='text' value={title} setValue={setTitle} />
+            <input
+              id="Title"
+              type="text"
+              className="border border-gray-400 p-2 rounded-lg px-3 w-full"
+              value={item.title}
+              onChange={(e) => {
+                const newValue = e.target.value
+                setBanners(prev =>
+                  prev.map(el => el.id === item.id ? { ...el, title: newValue } : el)
+                )
+              }}
+            />
+
           </div>
           <div>
             <Label name="Description" />
-            <Input classname="border border-gray-400" label='Description' type='text' value={text} setValue={setText} />
+            <input
+              id="Description"
+              type="text"
+              className="border border-gray-400 p-2 rounded-lg px-3 w-full"
+              value={item.text}
+              onChange={(e) => {
+                const newValue = e.target.value
+                setBanners(prev =>
+                  prev.map(el => el.id === item.id ? { ...el, text: newValue } : el)
+                )
+              }}
+            />
           </div>
           <div>
             <Label name="Button name" />
-            <Input classname="border border-gray-400" label='Button name' type='text' value={buttonName} setValue={setButtonName} />
+            <input
+              id='Button name'
+              type="text"
+              className="border border-gray-400 p-2 rounded-lg px-3 w-full"
+              value={item.buttonName}
+              onChange={(e) => {
+                const newValue = e.target.value
+                setBanners(prev =>
+                  prev.map(el => el.id === item.id ? { ...el, buttonName: newValue } : el)
+                )
+              }}
+            />
           </div>
-          {buttonName !== '' &&
+          {item.buttonName !== '' &&
             <div>
               <Label name="Button link" />
-              <BannerLinkSelection option="Select a item to link" value={buttonLink} setValue={setButtonLink} />
+              <BannerLinkSelection
+                option="Select an item to link"
+                value={item.buttonLink}
+                setValue={(newValue) =>
+                  setBanners(prev =>
+                    prev.map(el => el.id === item.id ? { ...el, buttonLink: newValue } : el)
+                  )
+                }
+              />
             </div>
           }
 
