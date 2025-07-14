@@ -20,7 +20,7 @@ export const fetchBanner = async () => {
 
 export const updateBanner = async (data: FormData) => {
   try {
-    const res = await axios.post('https://mmk-backend.onrender.com/replace', data)
+    const res = await axios.post('https://mmk-backend.onrender.com/banner/replace', data)
     return res
   } catch (err: unknown) {
     const error = err as any
