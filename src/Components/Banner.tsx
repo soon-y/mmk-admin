@@ -6,7 +6,7 @@ import { X } from "lucide-react"
 import { fetchBanner, sortBanner, updateBanner } from "../utils/bannerUtils"
 import Label from "./ui/label"
 import Input from "./ui/input"
-import BannerLinkSelection from "./ui/BannerLinkSelection"
+import BannerLinkSelection from "./ui/bannerLinkSelection"
 
 export default function Banner() {
   const [banners, setBanners] = useState<BannerProps[]>([])
