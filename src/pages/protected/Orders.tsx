@@ -1,16 +1,39 @@
 import { useEffect, useState } from 'react'
 import { ArrowDown01, ArrowDown10, ArrowDownAZ, ArrowDownZA } from 'lucide-react'
+import { fetchCustomerOrders, stringToDate } from '../../utils/orderUtils'
+import type { OrderProps } from '../../types'
+import { useNavigate } from 'react-router-dom'
+import Selection from '../../Components/ui/selection'
+import Badge from '../../Components/ui/badge'
 
 function Order() {
   const [loading, setLoading] = useState<boolean>(true)
-  const [sortBy, setSortBy] = useState<'id' | 'name' | 'date' | 'quantity' | 'total' | null>('id')
+  const [orders, setOrders] = useState<OrderProps[]>([])
+  const [sortBy, setSortBy] = useState<'created_at' | 'orderId' | 'userInfo' | 'paidAmount' | null>('created_at')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
+  const navigate = useNavigate()
+  const [paymentMethodFilter, setPaymentMethodFilter] = useState('')
+  const paymentMethodFilterData: string[] = ['Klarna', 'Visa', 'Master', 'PayPal']
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState('')
+  const paymentStatusFilterData: string[] = ['approved', 'processing', 'declined']
+  const [statusFilter, setStatusFilter] = useState('')
+  const statusFilterData: string[] = ['ordered', 'processing completed', 'shipped', 'delivered']
+  const style = 'grid grid-cols-[140px_220px_80px_90px_110px_190px_1fr] gap-4 items-center px-4 py-4 border-b border-gray-300'
 
   useEffect(() => {
     setLoading(false)
   }, [])
 
-  function toggleSort(field: 'id' | 'name' | 'date' | 'quantity' | 'total') {
+  useEffect(() => {
+    fetchCustomerOrders().then((res) => {
+      if (res) {
+        setOrders(res)
+        setLoading(false)
+      }
+    })
+  }, [])
+
+  function toggleSort(field: 'created_at' | 'orderId' | 'userInfo' | 'paidAmount') {
     if (sortBy === field) {
       setSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'))
     } else {
@@ -21,58 +44,73 @@ function Order() {
 
   function SortArrow({ field }: { field: string }) {
     if (sortBy !== field) return null
-    if (field === 'name') return sortDir === 'asc' ? <ArrowDownAZ className='w-5 ml-2' /> : <ArrowDownZA className='w-5 ml-2' />
+    if (field === 'orderId' || field === 'userInfo') return sortDir === 'asc' ? <ArrowDownAZ className='w-5 ml-2' /> : <ArrowDownZA className='w-5 ml-2' />
     return sortDir === 'asc' ? <ArrowDown01 className='w-5 ml-2' /> : <ArrowDown10 className='w-5 ml-2' />
   }
 
-  // const sortedProducts = [...products]
-  //   .filter(p => !categoryFilter || category[p.category-1].name === categoryFilter)
-  //   .sort((a, b) => {
-  //     if (!sortBy) return 0
-  //     const valA = a[sortBy]
-  //     const valB = b[sortBy]
+  const sortedorders = [...orders]
+    .filter(order => {
+      const matchPaymentMethod = !paymentMethodFilter || order.paymentMethod === paymentMethodFilter
+      const matchPaymentStatus = !paymentStatusFilter || order.paymentStatus === paymentStatusFilter
+      const matchStatus = !statusFilter || order.status === statusFilter
+      return matchPaymentMethod && matchPaymentStatus && matchStatus
+    })
+    .sort((a, b) => {
+      if (!sortBy) return 0
+      const valA = a[sortBy]
+      const valB = b[sortBy]
 
-  //     if (typeof valA === 'number' && typeof valB === 'number') {
-  //       return sortDir === 'asc' ? valA - valB : valB - valA
-  //     }
+      if (typeof valA === 'number' && typeof valB === 'number') {
+        return sortDir === 'asc' ? valA - valB : valB - valA
+      }
 
-  //     return sortDir === 'asc'
-  //       ? String(valA).localeCompare(String(valB))
-  //       : String(valB).localeCompare(String(valA))
-  //   })
+      return sortDir === 'asc'
+        ? String(valA).localeCompare(String(valB))
+        : String(valB).localeCompare(String(valA))
+    })
+
 
   return (
-    <div className="container p-8">
-      <div className="h-16 grid grid-cols-5 gap-2 bg-white p-4 rounded-xl font-bold text-sm mb-2 flex items-center">
-        <div className='cursor-pointer h-5 flex itmes-center' onClick={() => toggleSort('id')}>Order ID <SortArrow field="id" /> </div>
-        <div className='cursor-pointer h-5 flex itmes-center' onClick={() => toggleSort('name')}>Customer <SortArrow field="name" /></div>
-        <div className='cursor-pointer h-5 flex itmes-center' onClick={() => toggleSort('date')}>Date <SortArrow field="price" /></div>
-        <div className='cursor-pointer h-5 flex itmes-center' onClick={() => toggleSort('quantity')}>Quantity <SortArrow field="stock" /></div>
-        <div className='cursor-pointer h-5 flex itmes-center' onClick={() => toggleSort('total')}>Total <SortArrow field="stock" /></div>
+    <div className="container-overflow-x">
+      <div className="p-8 w-max xl:w-full">
+        <div className={`${style} bg-white rounded-xl font-bold text-sm mb-2`}>
+          <div className='cursor-pointer h-5 flex itmes-center' onClick={() => toggleSort('created_at')}>Date <SortArrow field="created_at" /></div>
+          <div className='cursor-pointer h-5 flex itmes-center' onClick={() => toggleSort('orderId')}>ID <SortArrow field="orderId" /> </div>
+          <div className='cursor-pointer h-5 flex itmes-center' onClick={() => toggleSort('paidAmount')}>Amount <SortArrow field="paidAmount" /></div>
+          <Selection value={paymentMethodFilter} setValue={setPaymentMethodFilter} option='P. Method' data={paymentMethodFilterData} />
+          <Selection value={paymentStatusFilter} setValue={setPaymentStatusFilter} option='P. Status' data={paymentStatusFilterData} />
+          <Selection value={statusFilter} setValue={setStatusFilter} option='Status' data={statusFilterData} />
+          <div className='cursor-pointer h-5 flex itmes-center' onClick={() => toggleSort('userInfo')}>Customer <SortArrow field="userInfo" /></div>
+        </div>
+
+        {!loading && orders.length > 0 ?
+          sortedorders.map((order, i) => (
+            <div onClick={() => navigate(`/orders/${order.userId}/${order.orderId}`)} key={i} className={`${style} py-1 cursor-pointer`}>
+              <p>{stringToDate(order.created_at!)}</p>
+              <p>{order.orderId}</p>
+              <p>{order.paidAmount}</p>
+              <p>{order.paymentMethod}</p>
+              {Badge(order.paymentStatus)}
+              {Badge(order.status)}
+              <p>{order.userInfo!.email}</p>
+            </div>
+          ))
+          :
+          <div>
+            {Array.from({ length: 15 }).map((_, i) => (
+              <div key={i} className={`${style} my-1 animate-pulse`}>
+                <p className='rounded-md w-full h-6 bg-gray-200'></p>
+                <p className='rounded-md w-full h-6 bg-gray-200'></p>
+                <p className='rounded-md w-12 h-6 bg-gray-200'></p>
+                <p className='rounded-md w-14 h-6 bg-gray-200'></p>
+                <p className='rounded-full w-full h-9 border-gray-300 border-2 bg-gray-200'></p>
+                <p className='rounded-full w-full h-9 border-gray-300 border-2 bg-gray-200'></p>
+                <p className='rounded-md w-full h-6 bg-gray-200'></p>
+              </div>
+            ))}
+          </div>
+        }
       </div>
-
-      {/* {sortedProducts.map((product) => (
-        <div onClick={() => navigate(`/product/${product.id}`)} key={product.id}
-          className='grid grid-cols-[60px_140px_1fr_10%_10%_120px] gap-2 items-center border-b border-gray-300 cursor-pointer'>
-          <p className='pl-4'>{product.id}</p>
-          <p className='pl-5'>{category[product.category-1].name}</p>
-          <p className='pl-4'>{product.name}</p>
-          <p className='pl-4'>{product.price}</p>
-          <p className='pl-4'>{product.stock}</p>
-          <img src={product.mainImg} alt="Product" />
-        </div>
-      ))} */}
-
-      {loading && Array.from({ length: 10 }).map((_, i) => (
-        <div key={i} className='grid grid-cols-[60px_140px_1fr_10%_10%_120px] gap-2 items-center border-b border-gray-300'>
-          <p className='ml-4 rounded-md w-8 h-6 bg-gray-200 animate-pulse'></p>
-          <p className='ml-5 rounded-md w-14 h-6 bg-gray-200 animate-pulse'></p>
-          <p className='ml-4 rounded-md w-[50%] h-6 bg-gray-200 animate-pulse'></p>
-          <p className='ml-4 rounded-md w-8 h-6 bg-gray-200 animate-pulse'></p>
-          <p className='ml-4 rounded-md w-8 h-6 bg-gray-200 animate-pulse'></p>
-        </div>
-      ))}
-
     </div>
   )
 }
