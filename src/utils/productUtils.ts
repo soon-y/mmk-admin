@@ -10,6 +10,11 @@ export const fetchProducts = async () => {
   }
 }
 
+export const fetchProduct = async (id: number) => {
+  const res = axios.get(`https://mmk-backend.onrender.com/products/${id}`)
+  return res
+}
+
 export const groupingImages = (existingImagesCount: string[], images: string[]) => {
   const groupedImages: string[][] = []
   let start = 0
@@ -20,6 +25,25 @@ export const groupingImages = (existingImagesCount: string[], images: string[]) 
   }
 
   return groupedImages
+}
+
+export const grouppingImgs = (images: string[], imagesCount: string) => {
+  const imgCnt = imagesCount.split('/').map(Number)
+
+  const groupedImages: string[][] = []
+  let start = 0
+
+  for (const count of imgCnt) {
+    groupedImages.push(images.slice(start, start + count))
+    start += count
+  }
+
+  return groupedImages
+}
+
+export const grouppingStock = (stock: string) => {
+  const result = stock.split('/').map(group => group.split(',').map(Number))
+  return result
 }
 
 export const postProducts = async (formData: FormData) => {
