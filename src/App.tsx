@@ -13,6 +13,7 @@ import Login from './pages/Login'
 import Register from './pages/SignUp'
 import Profile from './pages/protected/Profile'
 import { AuthProvider } from './context/auth'
+import OrderDetail from './pages/protected/OrderDetail'
 
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
           <Route path="/product/:id" element={<PrivateRoute><ProductDetail /></PrivateRoute>} />
           <Route path="/new-product" element={<PrivateRoute><NewProduct /></PrivateRoute>} />
           <Route path="/orders" element={<PrivateRoute><Orders /></PrivateRoute>} />
+          <Route path="/orders/:userId/:orderId" element={<PrivateRoute><OrderDetail /></PrivateRoute>} />
           <Route path="/settings" element={<PrivateRoute><Setting /></PrivateRoute>} />
           <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
           <Route path="*" element={<NotFound />} />
