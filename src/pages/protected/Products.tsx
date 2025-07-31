@@ -11,7 +11,7 @@ function Products() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState<boolean>(true)
   const [products, setProducts] = useState<ProductDisplayProps[]>([])
-  const [sortBy, setSortBy] = useState<'id' | 'name' | 'price' | 'stock' | null>('id')
+  const [sortBy, setSortBy] = useState<'id' | 'name' | 'price' | 'discount' | 'stock' | null>('id')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
   const [categoryFilter, setCategoryFilter] = useState<string | number>('')
   const [sizeFilter, setSizeFilter] = useState('')
@@ -19,13 +19,13 @@ function Products() {
   const [sizeFilterData, setSizeFilterData] = useState<string[]>([])
   const [colorFilterData, setColorFilterData] = useState<string[]>([])
   const [category, setCategory] = useState<CategoryProps[]>([])
-  const style = 'grid grid-cols-[70px_100px_150px_80px_90px_120px_80px_120px] xl:grid-cols-[70px_100px_1fr_80px_90px_120px_80px_120px] gap-2 items-center'
+  const style = 'grid grid-cols-[70px_100px_1fr_80px_100px_90px_120px_80px_120px] gap-4 items-center'
 
   useEffect(() => {
     Promise.all([fetchCategory(), fetchProducts()])
       .then(([categoryData, productData]) => {
         setCategory(categoryData)
-
+  
         const newProductArr: ProductDisplayProps[] = []
 
         productData.forEach((p: ProductProps) => {
@@ -55,6 +55,7 @@ function Products() {
                 id: p.id,
                 name: p.name,
                 category: p.category,
+                discount: p.discount,
                 price: p.price,
                 stock: (stock[i][j].toString()),
                 images: groupedImages[j],
@@ -77,7 +78,7 @@ function Products() {
       })
   }, [])
 
-  function toggleSort(field: 'id' | 'name' | 'price' | 'stock') {
+  function toggleSort(field: 'id' | 'name' | 'discount' | 'price' | 'stock') {
     if (sortBy === field) {
       setSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'))
     } else {
@@ -93,7 +94,7 @@ function Products() {
   }
 
   const sortedProducts = [...products].filter(p =>
-    (!categoryFilter || category[p.category - 1].name === categoryFilter) &&
+    (!categoryFilter || category[category.findIndex((el)=> el.id === p.category)].name === categoryFilter) &&
     (!sizeFilter || p.size === sizeFilter) &&
     (!colorFilter || p.color === colorFilter)
   ).sort((a, b) => {
@@ -118,6 +119,7 @@ function Products() {
           <CategorySelection disabled={false} option='Category' categoryIndex={categoryFilter} noPadding={true} setValue={setCategoryFilter} setLoading={setLoading} />
           <div className='cursor-pointer h-5 flex itmes-center' onClick={() => toggleSort('name')}>Name <SortArrow field="name" /></div>
           <div className='cursor-pointer h-5 flex itmes-center' onClick={() => toggleSort('price')}>Price <SortArrow field="price" /></div>
+          <div className='cursor-pointer h-5 flex itmes-center' onClick={() => toggleSort('discount')}>Discount <SortArrow field="discount" /></div>
           <Selection value={sizeFilter} setValue={setSizeFilter} option='Size' data={sizeFilterData} />
           <Selection value={colorFilter} setValue={setColorFilter} option='Color' data={colorFilterData} />
           <div className='cursor-pointer h-5 flex itmes-center' onClick={() => toggleSort('stock')}>Stock <SortArrow field="stock" /></div>
@@ -128,11 +130,19 @@ function Products() {
           <div onClick={() => navigate(`/product/${product.id}`)} key={index}
             className={`${style} border-b border-gray-300 cursor-pointer`}>
             <p className='ml-4'>{product.id}</p>
-            <p>{category[product.category - 1].name}</p>
+            <p>{category[category.findIndex((el)=> el.id === product.category)].name}</p>
             <p>{product.name}</p>
             <p>{product.price}</p>
+            <div>
+              {product.discount !== product.price &&  
+              <div className='flex gap-2 items-center'>
+              <p>{product.discount}</p>
+              <p className='px-1 font-semibold text-sm bg-gray-400 text-white rounded-sm'>{Math.round((product.price - product.discount) / product.price * 100) + '%'}</p>
+              </div>
+              }
+            </div>
             <p>{product.size}</p>
-            <p>{product.color}</p>
+            <p>{product.color}</p> 
             <p>{product.stock}</p>
             <img src={product.images[0]} alt="Product" />
           </div>
@@ -142,13 +152,11 @@ function Products() {
           <div key={i} className={`${style} border-b border-gray-300 animate-pulse`}>
             <p className='ml-4 rounded-md w-8 h-6 bg-gray-200'></p>
             <p className='rounded-md w-[90%] h-6 bg-gray-200'></p>
-            <p className='rounded-md w-[50%] h-6 bg-gray-200'></p>
-            <p className='rounded-md w-6 h-6 bg-gray-200'></p>
+            <p className='rounded-md w-[90%] h-6 bg-gray-200'></p>
+            <p className='rounded-md w-10 h-6 bg-gray-200'></p>
+            <p className='rounded-md w-10 h-6 bg-gray-200'></p>
             <p className='rounded-md w-18 h-6 bg-gray-200'></p>
-            <div className='flex gap-2'>
-              <p key={i} className='border border-gray-300 rounded-full w-5 aspect-square bg-gray-200'></p>
-              <p className='rounded-md w-12 h-6 bg-gray-200'></p>
-            </div>
+            <p className='rounded-md w-16 h-6 bg-gray-200'></p>
             <p className='rounded-md w-6 h-6 bg-gray-200'></p>
             <div className='w-[120px] aspect-square bg-gray-200 grid place-items-center'>
               <Image className='text-gray-400' />

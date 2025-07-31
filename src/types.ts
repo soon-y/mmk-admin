@@ -3,6 +3,7 @@ export type ProductProps = {
   name: string
   category: number
   price: number
+  discount: number
   stock: string
   images: string[]
   description: string
@@ -18,6 +19,7 @@ export type ProductDisplayProps = {
   id: number
   name: string
   category: number
+  discount: number
   price: number
   stock: string
   images: string[]

@@ -23,6 +23,8 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
   const [loading, setLoading] = useState<boolean>(false)
   const [name, setName] = useState<string>(product === '' ? '' : product.name)
   const [price, setPrice] = useState<string>(product === '' ? '' : product.price.toString())
+  const [discount, setDiscount] = useState<string>(product === '' ? '' : product.discount.toString())
+  const [discountEnabled, setDiscountEnabled] = useState<boolean>(product === '' ? false : product.discount === product.price ? false : true)
   const [size, setSize] = useState<string[]>(product === '' ? ['one size'] : product.size.split('/'))
   const [color, setColor] = useState<string[]>(product === '' ? ['White'] : product.color.split('/'))
   const [stock, setStock] = useState<number[][]>(product === '' ? [[0]] : product.stock.split('/').map(row => row.split(',').map(Number)))
@@ -39,6 +41,12 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
   const [deletedSizeIndex, setDeletedSizeIndex] = useState<number | null>(null)
   const [category, setCategory] = useState<CategoryProps[]>([])
   const { user } = useAuth()
+
+  useEffect(() => {
+    if (!discountEnabled) {
+      setDiscount(price)
+    }
+  }, [discountEnabled, price])
 
   useEffect(() => {
     fetchCategory().then((data) => {
@@ -110,6 +118,7 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
     const formData = new FormData()
     formData.append('name', name)
     formData.append('price', price)
+    formData.append('discount', discount)
     formData.append('description', description)
     formData.append('material', material)
     formData.append('measurement', measurement)
@@ -140,10 +149,7 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
       if (res) {
         setLoading(false)
         navigate('/products')
-      } else {
-
       }
-
     } else {
       formData.append('originalOrderCount', existingImagesCount.join('/'))
       formData.append('newOrderCount', imagesCount.join('/'))
@@ -173,12 +179,8 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
 
       const res = await updateProduct(product.id, formData)
       if (res) {
-        console.log('clicked')
-
         setLoading(false)
         navigate('/products')
-      } else {
-
       }
     }
   }
@@ -235,9 +237,25 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
               categoryIndex={categoryIndex} />
           </div>
 
-          <div>
-            <Label name='Price (€)' />
-            <Input label='Price' type='number' value={price} setValue={setPrice} />
+          <div className='grid md:grid-cols-2 gap-4'>
+            <div>
+              <div className='flex justify-between'>
+                <Label name='Price(€)' />
+                <label className="flex items-center gap-1">
+                  <input type="checkbox" checked={discountEnabled} onChange={(e) => setDiscountEnabled(e.target.checked)} />
+                  <span>discount</span>
+                </label>
+
+              </div>
+              <Input label='Price' type='number' value={price} setValue={setPrice} />
+            </div>
+            {discountEnabled && <div>
+              <div className='flex justify-between'>
+                <Label name='(€)' />
+                <p className='mb-1 flex items-center text-sm font-bold px-1 bg-red-500 rounded-md text-white'>{Math.round((Number(price) - Number(discount)) / Number(price) * 100)}%</p>
+              </div>
+              <Input label='Discount' type='number' value={discount} setValue={setDiscount} />
+            </div>}
           </div>
 
           <div>
@@ -359,13 +377,13 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
         ))}
 
         <div className='flex flex-col md:flex-row md:justify-between gap-4'>
-          <button type="submit" className='uppercase md:shrink-0'>
-            {location.pathname.includes('new') ? 'Add Product' : 'Update Product'}
-          </button>
-
           {!location.pathname.includes('new') &&
             <BtnForAdmin onClick={deleteAction} classname='w-full md:w-auto md:shrink-0'>delete</BtnForAdmin>
           }
+
+          <button type="submit" className='uppercase md:shrink-0'>
+            {location.pathname.includes('new') ? 'Add Product' : 'Update Product'}
+          </button>
         </div>
       </form>
 
