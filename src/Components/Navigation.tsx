@@ -1,4 +1,4 @@
-import { Boxes, PackagePlus, Truck, Settings, CircleUserRound } from "lucide-react"
+import { Boxes, PackagePlus, Truck, Settings, CircleUserRound, LayoutDashboard } from "lucide-react"
 import type { ReactNode } from "react"
 import { Link } from 'react-router-dom'
 import { useLocation } from 'react-router-dom'
@@ -8,6 +8,7 @@ function Navigation() {
   const { user } = useAuth()
   const location = useLocation()
   const menus: { link: string, label: string, icon: ReactNode }[] = [
+    { link: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard strokeWidth={1} /> },
     { link: 'products', label: 'Products', icon: <Boxes strokeWidth={1} /> },
     { link: 'new-product', label: 'New Product', icon: <PackagePlus strokeWidth={1} /> },
     { link: 'orders', label: 'Order', icon: <Truck strokeWidth={1} /> },
@@ -22,7 +23,7 @@ function Navigation() {
 
   return (
     <div className='fixed border-r border-r-[#eeeeee] w-[200px] h-[100vh] bg-white p-4'>
-      <Link to="/">
+      <Link to="/dashboard">
         <img src="/mmk-logo.png" className="m-auto w-[180px] mb-12" />
       </Link>
       {location.pathname !== '/login' && location.pathname !== '/signup'

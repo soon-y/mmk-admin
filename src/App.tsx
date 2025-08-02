@@ -1,7 +1,6 @@
 import './App.css'
 import Navigation from './Components/Navigation'
 import { Routes, Route } from 'react-router-dom'
-import Home from './pages/protected/Home'
 import Products from './pages/protected/Products'
 import ProductDetail from './pages/protected/ProductDetail'
 import NewProduct from './pages/protected/NewProduct'
@@ -16,6 +15,7 @@ import { AuthProvider } from './context/auth'
 import OrderDetail from './pages/protected/OrderDetail'
 import Customers from './pages/protected/Customers'
 import CustomerDetail from './pages/protected/CustomerDetail'
+import Dashboard from './pages/protected/Dashboard'
 
 function App() {
   return (
@@ -23,7 +23,8 @@ function App() {
       <AuthProvider>
         <Navigation />
         <Routes>
-          <Route path="/" element={<PrivateRoute><Home /></PrivateRoute>} />
+          <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+          <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/products" element={<PrivateRoute><Products /></PrivateRoute>} />
           <Route path="/product/:id" element={<PrivateRoute><ProductDetail /></PrivateRoute>} />
           <Route path="/customers" element={<PrivateRoute><Customers /></PrivateRoute>} />
