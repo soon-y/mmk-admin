@@ -1,4 +1,4 @@
-import { Boxes, PackagePlus, Truck, Settings } from "lucide-react"
+import { Boxes, PackagePlus, Truck, Settings, CircleUserRound } from "lucide-react"
 import type { ReactNode } from "react"
 import { Link } from 'react-router-dom'
 import { useLocation } from 'react-router-dom'
@@ -11,6 +11,7 @@ function Navigation() {
     { link: 'products', label: 'Products', icon: <Boxes strokeWidth={1} /> },
     { link: 'new-product', label: 'New Product', icon: <PackagePlus strokeWidth={1} /> },
     { link: 'orders', label: 'Order', icon: <Truck strokeWidth={1} /> },
+    { link: 'customers', label: 'Customers', icon: <CircleUserRound strokeWidth={1} /> },
     { link: 'settings', label: 'Settings', icon: <Settings strokeWidth={1} /> },
     { link: 'profile', label: 'Profile', icon: user ? <img className="w-6 rounded-full" src={user.avatar_url} /> : <div className="w-6 aspect-square bg-gray-200 rounded-full animate-pulse"></div> },
   ]

@@ -15,6 +15,16 @@ export type ProductProps = {
   measurement: string
 }
 
+export type CustomerProps = {
+  id: string
+  firstName: string
+  lastName: string
+  created_at: string
+  contact: string
+  email: string
+  payment: string
+}
+
 export type ProductDisplayProps = {
   id: number
   name: string
@@ -157,4 +167,14 @@ export type SortedOrderProductProps = {
   categoryGroup: string
   qnt: number
   total: number
+}
+
+export type addressProps = {
+  firstName: string
+  lastName: string
+  contact: string
+  street: string
+  postalCode: string
+  city: string
+  country: string
 }

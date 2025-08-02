@@ -81,7 +81,7 @@ function OrderDetail() {
 
                 <div className='grid grid-cols-[180px_1fr]'>
                   <p className='text-gray-500'>Customer</p>
-                  <p>{order.userInfo?.email}</p>
+                  <p className='hover:underline cursor-pointer' onClick={() => navigate(`/customers/${userId}`)}>{order.userInfo?.email}</p>
                 </div>
 
                 <div className='grid grid-cols-[180px_1fr]'>
