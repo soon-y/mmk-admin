@@ -12,7 +12,7 @@ export default function TextArea(
     <div>
       <Label name={label} />
       <textarea
-          className="w-full rounded-xl bg-white px-4 py-2"
+          className="w-full rounded-xl bg-white px-4 py-2 h-40"
           placeholder="Description"
           value={value}
           onChange={(e) => setValue(e.target.value)}
