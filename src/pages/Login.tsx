@@ -27,7 +27,7 @@ export default function Login() {
         if (userData && userData !== false) {
           setUser(userData)
           setLoading(false)
-          navigate('/')
+          navigate('/dashboard')
         }
       } else {
         setError('Unexpected response from server.')
