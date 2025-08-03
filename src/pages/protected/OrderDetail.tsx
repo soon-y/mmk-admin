@@ -26,7 +26,7 @@ function OrderDetail() {
       try {
         const [orders, products] = await Promise.all([
           fetchThisOrder(userId!, orderId!),
-          fetchOrderedProducts(userId!)
+          fetchOrderedProducts(userId!, orderId!)
         ])
 
         if (orders && products) {
