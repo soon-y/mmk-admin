@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react"
 import { fetchCustomerOrders } from "../../utils/orderUtils"
 import { getCustomers } from "../../utils/customerUtils"
-import type { CustomerProps, OrderProps } from "../../types"
+import type { CustomerProps } from "../../types"
 
 function Dashboard() {
-  const [order, setOrder] = useState<OrderProps[]>()
+  // const [order, setOrder] = useState<OrderProps[]>()
   const [customer, setCustomer] = useState<CustomerProps[]>()
 
   useEffect(() => {
     Promise.all([fetchCustomerOrders(), getCustomers()])
       .then(([orders, customers]) => {
         if (orders && customers) {
-          setOrder(orders)
+          // setOrder(orders)
           setCustomer(customers)
         }
       })
