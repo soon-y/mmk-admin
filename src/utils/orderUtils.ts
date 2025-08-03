@@ -2,6 +2,7 @@ import axios from 'axios'
 import type { CategoryProps, OrderedProductProps, OrderProps, ProductProps, SortedOrderProductProps, SortedOrderProps } from '../types'
 import { fetchProduct, grouppingImgs } from './productUtils'
 import { fetchCategory } from './categoryUtils'
+import { getCustomerInfoByUserId } from './customerUtils'
 
 export function stringToDate(dateString: string): string {
   const date = new Date(dateString)
@@ -70,22 +71,6 @@ export const sortedOrders = async (orders: OrderProps[], orderedProducts: Ordere
   return array
 }
 
-export const getCustomerInfoByUserId = async (user: string): Promise<string | null> => {
-  try {
-    const res = await axios.get(`https://mmk-backend.onrender.com/users/customerInfo`, {
-      params: { user }
-    })
-
-    if (res.status === 200 || res.status === 201) {
-      return res.data
-    } else {
-      return null
-    }
-  } catch (err) {
-    return null
-  }
-}
-
 export const fetchCustomerOrders = async (): Promise<OrderProps[] | null> => {
   try {
     const res = await axios.get(`https://mmk-backend.onrender.com/orders/customer`)
@@ -112,10 +97,10 @@ export const fetchCustomerOrders = async (): Promise<OrderProps[] | null> => {
   }
 }
 
-export const fetchOrderedProducts = async (user: string): Promise<OrderedProductProps[] | null> => {
+export const fetchOrderedProducts = async (user: string, orderId: string): Promise<OrderedProductProps[] | null> => {
   try {
     const products = await axios.get(`https://mmk-backend.onrender.com/orders/product`, {
-      params: { user }
+      params: { user, orderId }
     })
 
     if (products.status === 200 || products.status === 201) {
