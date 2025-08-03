@@ -19,7 +19,7 @@ export default function Input(
         placeholder={placeholder}
         type={type}
         value={value}
-        onChange={(e) => type === 'number' ? Number(e.target.value) > 0 ? setValue(e.target.value) : '' : setValue(e.target.value)}
+        onChange={(e) => setValue(e.target.value)}
         required
       />
     </div>
