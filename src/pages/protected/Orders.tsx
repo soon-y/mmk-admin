@@ -5,8 +5,10 @@ import type { OrderProps } from '../../types'
 import { useNavigate } from 'react-router-dom'
 import Selection from '../../Components/ui/selection'
 import Badge from '../../Components/ui/badge'
+import SearchBar from '../../Components/SearchBar'
 
 function Order() {
+  const [searchQuery, setSearchQuery] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(true)
   const [orders, setOrders] = useState<OrderProps[]>([])
   const [sortBy, setSortBy] = useState<'created_at' | 'orderId' | 'userInfo' | 'paidAmount' | null>('created_at')
@@ -18,7 +20,7 @@ function Order() {
   const paymentStatusFilterData: string[] = ['approved', 'processing', 'declined']
   const [statusFilter, setStatusFilter] = useState('')
   const statusFilterData: string[] = ['ordered', 'processing completed', 'shipped', 'delivered']
-  const style = 'grid grid-cols-[140px_220px_80px_90px_110px_190px_1fr] gap-4 items-center px-4 py-4 border-b border-gray-300'
+  const style = 'grid grid-cols-[150px_220px_80px_90px_110px_190px_1fr] gap-4 items-center px-4 py-4 border-b border-gray-300'
 
   useEffect(() => {
     setLoading(false)
@@ -53,7 +55,14 @@ function Order() {
       const matchPaymentMethod = !paymentMethodFilter || order.paymentMethod === paymentMethodFilter
       const matchPaymentStatus = !paymentStatusFilter || order.paymentStatus === paymentStatusFilter
       const matchStatus = !statusFilter || order.status === statusFilter
-      return matchPaymentMethod && matchPaymentStatus && matchStatus
+      const matchesSearch =
+        !searchQuery ||
+        Object.values(order)
+          .some(value =>
+            String(value).toLowerCase().includes(searchQuery.toLowerCase())
+          )
+
+      return matchPaymentMethod && matchPaymentStatus && matchStatus && matchesSearch
     })
     .sort((a, b) => {
       if (!sortBy) return 0
@@ -68,7 +77,6 @@ function Order() {
         ? String(valA).localeCompare(String(valB))
         : String(valB).localeCompare(String(valA))
     })
-
 
   return (
     <div className="container-overflow-x">
@@ -111,6 +119,8 @@ function Order() {
           </div>
         }
       </div>
+
+      <SearchBar value={searchQuery} setValue={setSearchQuery} />
     </div>
   )
 }

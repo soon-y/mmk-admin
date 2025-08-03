@@ -10,7 +10,7 @@ import SearchBar from '../../Components/SearchBar'
 function Customers() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState<boolean>(true)
-  const [value, setValue] = useState<string>('')
+  const [searchQuery, setSearchQuery] = useState<string>('')
   const [customers, setCustomers] = useState<CustomerProps[]>([])
   const [sortBy, setSortBy] = useState<'id' | 'firstName' | 'lastName' | 'created_at' | 'email' | null>('id')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
@@ -47,7 +47,14 @@ function Customers() {
   const sortedCustomers = [...customers]
     .filter(el => {
       const matchPaymentMethod = !paymentMethodFilter || el.payment === paymentMethodFilter
-      return matchPaymentMethod
+      const matchesSearch =
+      !searchQuery ||
+      Object.values(el)
+        .some(value =>
+          String(value).toLowerCase().includes(searchQuery.toLowerCase())
+        )
+
+      return matchPaymentMethod && matchesSearch
     }).sort((a, b) => {
       if (!sortBy) return 0
       const valA = a[sortBy]
@@ -99,7 +106,7 @@ function Customers() {
         ))}
       </div>
 
-      <SearchBar value={value} setValue={setValue}/>
+      <SearchBar value={searchQuery} setValue={setSearchQuery}/>
     </div>
   )
 }

@@ -6,9 +6,11 @@ import { fetchCategory } from "../../utils/categoryUtils"
 import { fetchProducts, groupingImages } from '../../utils/productUtils'
 import CategorySelection from '../../Components/ui/categorySelection'
 import Selection from '../../Components/ui/selection'
+import SearchBar from '../../Components/SearchBar'
 
 function Products() {
   const navigate = useNavigate()
+  const [searchQuery, setSearchQuery] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(true)
   const [products, setProducts] = useState<ProductDisplayProps[]>([])
   const [sortBy, setSortBy] = useState<'id' | 'name' | 'price' | 'discount' | 'stock' | null>('id')
@@ -93,11 +95,25 @@ function Products() {
     return sortDir === 'asc' ? <ArrowDown01 className='w-5 ml-2' /> : <ArrowDown10 className='w-5 ml-2' />
   }
 
-  const sortedProducts = [...products].filter(p =>
-    (!categoryFilter || category[category.findIndex((el)=> el.id === p.category)].name === categoryFilter) &&
-    (!sizeFilter || p.size === sizeFilter) &&
-    (!colorFilter || p.color === colorFilter)
-  ).sort((a, b) => {
+  const sortedProducts = [...products]
+  .filter(p => {
+    const matchesCategory =
+      !categoryFilter ||
+      category[category.findIndex(el => el.id === p.category)]?.name === categoryFilter
+
+    const matchesSize = !sizeFilter || p.size === sizeFilter
+    const matchesColor = !colorFilter || p.color === colorFilter
+
+    const matchesSearch =
+      !searchQuery ||
+      Object.values(p)
+        .some(value =>
+          String(value).toLowerCase().includes(searchQuery.toLowerCase())
+        )
+
+    return matchesCategory && matchesSize && matchesColor && matchesSearch
+  })
+  .sort((a, b) => {
     if (!sortBy) return 0
     const valA = a[sortBy]
     const valB = b[sortBy]
@@ -110,6 +126,7 @@ function Products() {
       ? String(valA).localeCompare(String(valB))
       : String(valB).localeCompare(String(valA))
   })
+
 
   return (
     <div className="container-overflow-x">
@@ -164,6 +181,8 @@ function Products() {
           </div>
         ))}
       </div>
+
+      <SearchBar value={searchQuery} setValue={setSearchQuery}/>
     </div>
   )
 }
