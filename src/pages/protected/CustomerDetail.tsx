@@ -131,7 +131,7 @@ function CustomerDetail() {
             <h3 className='mb-1'>Orders</h3>
             {orders && orders.length > 0 ?
               <div className='bg-white p-4 rounded-md'>
-                <div className='grid grid-cols-[18px_1fr_1fr_1fr_1fr_1fr] gap-4' onClick={() => navigate(`/orders/${id}/${el.orderId}`)}>
+                <div className='grid grid-cols-[18px_1fr_1fr_1fr_1fr_1fr] gap-4'>
                   <p>No.</p>
                   <p>Ordered at</p>
                   <p>Amount(€)</p>
