@@ -115,6 +115,11 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
       return
     }
 
+    if (Number(price) <= 0) {
+      alert("Price is not valid")
+      return
+    }
+
     const formData = new FormData()
     formData.append('name', name)
     formData.append('price', price)
@@ -278,6 +283,7 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
               setColorHex(prev => [...prev, '#ffffff'])
               setStock(prev => prev.map(row => [...row, 0]))
               setImages(prev => [...prev, []])
+              setExistingImages(prev => [...prev, []])
               setImagesCount(prev => [...prev, '0'])
             }} />
 
@@ -336,8 +342,9 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
               ref={el => { fileInputRefs.current[i] = el }}
             />
 
+
             <div className="grid grid-cols-4 gap-2 mb-2">
-              {existingImages.length > 0 && (
+              {product !== '' && existingImages.length > 0 && (
                 existingImages[i].map((url, index) => (
                   <div key={index} className="relative aspect-square">
                     <img
@@ -350,8 +357,8 @@ function ProductForm({ product }: { product: ProductProps | '' }) {
                       className="cursor-pointer text-gray-700 absolute top-2 right-2 rounded-full w-5 h-5 p-1 border bg-white"
                     />
                   </div>
-                ))
-              )}
+                )))}
+
 
               {images[i]?.length > 0 && (
                 images[i].map((file, index) => (
