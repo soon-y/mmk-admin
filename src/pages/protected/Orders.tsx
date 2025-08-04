@@ -12,7 +12,7 @@ function Order() {
   const [loading, setLoading] = useState<boolean>(true)
   const [orders, setOrders] = useState<OrderProps[]>([])
   const [sortBy, setSortBy] = useState<'created_at' | 'orderId' | 'userInfo' | 'paidAmount' | null>('created_at')
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
   const navigate = useNavigate()
   const [paymentMethodFilter, setPaymentMethodFilter] = useState('')
   const paymentMethodFilterData: string[] = ['Klarna', 'Visa', 'Master', 'PayPal']

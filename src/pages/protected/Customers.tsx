@@ -13,7 +13,7 @@ function Customers() {
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [customers, setCustomers] = useState<CustomerProps[]>([])
   const [sortBy, setSortBy] = useState<'id' | 'firstName' | 'lastName' | 'created_at' | 'email' | null>('id')
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
   const paymentMethodFilterData: string[] = ['Klarna', 'Visa', 'Master', 'PayPal']
   const [paymentMethodFilter, setPaymentMethodFilter] = useState('')
 
