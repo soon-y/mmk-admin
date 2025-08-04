@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { fetchAllOrderedProducts, fetchCustomerOrders, fetchOrderedProducts } from "../../utils/orderUtils"
+import { fetchAllOrderedProducts, fetchCustomerOrders } from "../../utils/orderUtils"
 import { getCustomers } from "../../utils/customerUtils"
 import type { CustomerProps, OrderedProductProps, OrderProps, ProductProps } from "../../types"
 import { fetchProduct, grouppingImgs } from "../../utils/productUtils"
