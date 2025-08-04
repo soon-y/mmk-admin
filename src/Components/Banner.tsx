@@ -59,7 +59,7 @@ export default function Banner() {
 
   const addNewBanner = () => {
     const newItem = {
-      id: banners.length + 1,
+      id: banners[banners.length - 1].id + 1,
       title: 'title',
       text: '',
       buttonName: '',
@@ -118,7 +118,7 @@ export default function Banner() {
           <div className="animate-pulse" key={i}>
             <div className="flex justify-end mt-8 mb-2 md:mb-2 gap-2">
               {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="w-7 rounded-full aspect-square bg-gray-100"></div>
+                <div key={i} className="w-7 rounded-full aspect-square bg-gray-100"></div>
               ))}
             </div>
             <div className="grid grid-rows md:grid-cols-2 gap-4">
@@ -164,6 +164,8 @@ const BannerComp = ({ banners, index, setBanners }: {
   const item = banners[index]
   const fileInputRef = useRef<(HTMLInputElement | null)>(null)
   const i = item.id
+
+  console.log(banners)
 
   const addImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -266,10 +268,10 @@ const BannerComp = ({ banners, index, setBanners }: {
           </div>
           <div>
             <Label name="Description" />
-            <input
-              id="Description"
-              type="text"
-              className="border border-gray-400 p-2 rounded-lg px-3 w-full"
+            <textarea
+              required
+              className="border border-gray-400 p-2 rounded-lg px-3 w-full h-18"
+              placeholder="Description"
               value={item.text}
               onChange={(e) => {
                 const newValue = e.target.value
@@ -308,7 +310,6 @@ const BannerComp = ({ banners, index, setBanners }: {
               />
             </div>
           }
-
         </div>
       </div>
     </div>
