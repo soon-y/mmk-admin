@@ -97,6 +97,20 @@ export const fetchCustomerOrders = async (): Promise<OrderProps[] | null> => {
   }
 }
 
+export const fetchAllOrderedProducts = async (): Promise<OrderedProductProps[] | null> => {
+  try {
+    const products = await axios.get(`http://localhost:3000/orders/allProduct`)
+
+    if (products.status === 200 || products.status === 201) {
+      return products.data
+    } else {
+      return null
+    }
+  } catch (err) {
+    return null
+  }
+}
+
 export const fetchOrderedProducts = async (user: string, orderId: string): Promise<OrderedProductProps[] | null> => {
   try {
     const products = await axios.get(`https://mmk-backend.onrender.com/orders/product`, {
