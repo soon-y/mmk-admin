@@ -165,8 +165,6 @@ const BannerComp = ({ banners, index, setBanners }: {
   const fileInputRef = useRef<(HTMLInputElement | null)>(null)
   const i = item.id
 
-  console.log(banners)
-
   const addImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
 
