@@ -38,7 +38,7 @@ export const sortedOrders = async (orders: OrderProps[], orderedProducts: Ordere
 
   const promises = orderedProducts.map(async (p) => {
     const productData = await fetchProduct(p.productId)
-    const product: ProductProps = productData.data
+    const product: ProductProps = productData!
 
     const colorId = product.color.split('/').findIndex((item) => item === p.color)
     const img = grouppingImgs(product.images, product.imagesCount)[colorId][0]
@@ -99,7 +99,7 @@ export const fetchCustomerOrders = async (): Promise<OrderProps[] | null> => {
 
 export const fetchAllOrderedProducts = async (): Promise<OrderedProductProps[] | null> => {
   try {
-    const products = await axios.get(`http://localhost:3000/orders/allProduct`)
+    const products = await axios.get(`https://mmk-backend.onrender.com/orders/allProduct`)
 
     if (products.status === 200 || products.status === 201) {
       return products.data
