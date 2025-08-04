@@ -1,4 +1,5 @@
 import axios from 'axios'
+import type { ProductProps } from '../types'
 
 export const fetchProducts = async () => {
   try {
@@ -10,9 +11,17 @@ export const fetchProducts = async () => {
   }
 }
 
-export const fetchProduct = async (id: number) => {
-  const res = axios.get(`https://mmk-backend.onrender.com/products/${id}`)
-  return res
+export const fetchProduct = async (id: number): Promise<ProductProps | null> => {
+  try {
+    const res = await axios.get(`https://mmk-backend.onrender.com/products/${id}`)
+    if (res.status === 200 || res.status === 201) {
+      return res.data
+    } else {
+      return null
+    }
+  } catch (err) {
+    return null
+  }
 }
 
 export const groupingImages = (existingImagesCount: string[], images: string[]) => {
@@ -74,7 +83,7 @@ export const updateProduct = async (id: number, formData: FormData) => {
   }
 }
 
-export const deleteProduct  = async (id: number) => {
+export const deleteProduct = async (id: number) => {
   try {
     const res = await axios.delete(`https://mmk-backend.onrender.com/products/${id}`)
     return res
