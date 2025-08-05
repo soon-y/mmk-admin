@@ -250,10 +250,10 @@ const BannerComp = ({ banners, index, setBanners }: {
         <div className="flex flex-col gap-1">
           <div>
             <Label name="Title" />
-            <input
-              id="Title"
-              type="text"
-              className="border border-gray-400 p-2 rounded-lg px-3 w-full"
+            <textarea
+              required
+              className="border border-gray-400 p-2 rounded-lg px-3 w-full h-16"
+              placeholder="title"
               value={item.title}
               onChange={(e) => {
                 const newValue = e.target.value
@@ -262,7 +262,6 @@ const BannerComp = ({ banners, index, setBanners }: {
                 )
               }}
             />
-
           </div>
           <div>
             <Label name="Description" />
