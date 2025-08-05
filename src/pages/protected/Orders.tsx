@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { ArrowDown01, ArrowDown10, ArrowDownAZ, ArrowDownZA } from 'lucide-react'
 import { fetchCustomerOrders, stringToDate } from '../../utils/orderUtils'
 import type { OrderProps } from '../../types'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import Selection from '../../Components/ui/selection'
 import Badge from '../../Components/ui/badge'
 import SearchBar from '../../Components/SearchBar'
@@ -21,9 +21,14 @@ function Order() {
   const [statusFilter, setStatusFilter] = useState('')
   const statusFilterData: string[] = ['ordered', 'processing completed', 'shipped', 'delivered']
   const style = 'grid grid-cols-[150px_220px_80px_90px_110px_190px_1fr] gap-4 items-center px-4 py-4 border-b border-gray-300'
+  const location = useLocation()
 
   useEffect(() => {
     setLoading(false)
+
+  const queryParams = new URLSearchParams(location.search)
+  const status = queryParams.get('status')
+  if(status) setStatusFilter(statusFilterData[0])
   }, [])
 
   useEffect(() => {

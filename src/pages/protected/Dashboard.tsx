@@ -13,7 +13,7 @@ function Dashboard() {
   const [sales, setSales] = useState<number>(0)
   const [orders, setOrders] = useState<OrderProps[]>()
   const [totalOrder, setTotalOrder] = useState<number>(0)
-  const [todayOrder, setTodayOrder] = useState<number>(0)
+  const [orderToProceed, setOrderToProceed] = useState<number>(0)
   const [bestProducts, setBestProducts] = useState<ProductProps[]>()
   const [bestProductsInfo, setBestProductsInfo] = useState<{ productId: number, color: string, size: string, count: number }[]>()
   const [customer, setCustomer] = useState<CustomerProps[]>()
@@ -48,17 +48,14 @@ function Dashboard() {
           const totalPaid = orders.reduce((sum, order) => sum + order.paidAmount, 0)
           setSales(totalPaid)
           setTotalOrder(orders.length)
-          setTodayOrder(countTodaysOrders(orders))
+          setOrderToProceed(countOrderToProceed(orders))
         }
         setLoading(false)
       })
   }, [])
 
-  function countTodaysOrders(orders: OrderProps[]): number {
-    const today = new Date()
-    const todayStr = today.toISOString().slice(0, 10)
-
-    return orders.filter(order => order.created_at!.slice(0, 10) === todayStr).length
+  function countOrderToProceed(orders: OrderProps[]): number {
+    return orders.filter(order => order.status === 'ordered').length
   }
 
   function getTop3BestSelling(orderedProducts: OrderedProductProps[]): { productId: number, color: string, size: string, count: number }[] {
@@ -94,13 +91,13 @@ function Dashboard() {
               <h2>Total Sales</h2>
               <span className="text-xl font-bold">{sales}</span> €
             </div>
-            <div className="p-4 bg-white rounded-xl shadow-md text-center" onClick={() => navigate('/orders')}>
+            <div className="p-4 bg-white rounded-xl shadow-md text-center cursor-pointer" onClick={() => navigate('/orders')}>
               <h2>Total Orders</h2>
               <p className="text-xl font-bold">{totalOrder}</p>
             </div>
-            <div className="p-4 bg-white rounded-xl shadow-md text-center" onClick={() => navigate('/orders')}>
-              <h2>Today's Orders</h2>
-              <p className="text-xl font-bold">{todayOrder}</p>
+            <div className="p-4 bg-white rounded-xl shadow-md text-center cursor-pointer" onClick={() => navigate('/orders?status=ordered')}>
+              <h2>Orders to proceed</h2>
+              <p className="text-xl font-bold">{orderToProceed}</p>
             </div>
             <div className="p-4 bg-white rounded-xl shadow-md text-center" onClick={() => navigate('/customers')}>
               <h2>Customers</h2>
