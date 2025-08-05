@@ -3,7 +3,7 @@ import type { addressProps, CustomerProps, OrderProps } from '../types'
 
 export const getCustomers = async (): Promise<CustomerProps[] | null> => {
   try {
-    const res = await axios.get(`http://localhost:3000/users/customers`)
+    const res = await axios.get(`https://mmk-backend.onrender.com/users/customers`)
 
     if (res.status === 200 || res.status === 201) {
       return res.data
@@ -17,7 +17,7 @@ export const getCustomers = async (): Promise<CustomerProps[] | null> => {
 
 export const getCustomerInfoByUserId = async (user: string): Promise<CustomerProps | null> => {
   try {
-    const res = await axios.get(`http://localhost:3000/users/customerInfo`, {
+    const res = await axios.get(`https://mmk-backend.onrender.com/users/customerInfo`, {
       params: { user }
     })
 
@@ -33,7 +33,7 @@ export const getCustomerInfoByUserId = async (user: string): Promise<CustomerPro
 
 export const getCustomerAddressByUserId = async (user: string): Promise<addressProps | null> => {
   try {
-    const res = await axios.get(`http://localhost:3000/users/customerAddress`, {
+    const res = await axios.get(`https://mmk-backend.onrender.com/users/customerAddress`, {
       params: { user }
     })
 
@@ -49,7 +49,7 @@ export const getCustomerAddressByUserId = async (user: string): Promise<addressP
 
 export const getCustomerBillingAddressByUserId = async (user: string): Promise<addressProps | null> => {
   try {
-    const res = await axios.get(`http://localhost:3000/users/customerBillingAddress`, {
+    const res = await axios.get(`https://mmk-backend.onrender.com/users/customerBillingAddress`, {
       params: { user }
     })
 
@@ -65,7 +65,7 @@ export const getCustomerBillingAddressByUserId = async (user: string): Promise<a
 
 export const getCustomerOrdersByUserId = async (user: string): Promise<OrderProps[] | null> => {
   try {
-    const res = await axios.get(`http://localhost:3000/users/customerOrders`, {
+    const res = await axios.get(`https://mmk-backend.onrender.com/users/customerOrders`, {
       params: { user }
     })
 
