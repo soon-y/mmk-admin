@@ -57,7 +57,7 @@ export const grouppingStock = (stock: string) => {
 
 export const postProducts = async (formData: FormData) => {
   try {
-    const res = await axios.post('http://localhost:3000/products', formData, {
+    const res = await axios.post('https://mmk-backend.onrender.com/products', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
